@@ -10,4 +10,19 @@
     <string name="placeholder_weather">Partly Cloudy</string>
     <string name="placeholder_lowhigh">67 F / 80 F</string>
     <string name="placeholder_current">75 F</string>
+
+    <string name="pref_location">Location</string>
+    <string name="pref_metric">Temperature Metric</string>
+    <string name="pref_zipcode">Zipcode</string>
+
+    <string-array name="pref_location_list">
+        <item>GPS Only</item>
+        <item>Network Only</item>
+        <item>Manual Zipcode</item>
+    </string-array>
+
+    <string-array name="pref_metrics_list">
+        <item>Fahrenheit (F)</item>
+        <item>Celsius (C)</item>
+    </string-array>
 </resources>

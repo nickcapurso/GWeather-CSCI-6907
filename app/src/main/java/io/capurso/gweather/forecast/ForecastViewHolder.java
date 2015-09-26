@@ -11,12 +11,14 @@ import io.capurso.gweather.R;
  * Created by cheng on 9/26/15.
  */
 public class ForecastViewHolder extends RecyclerView.ViewHolder{
+    private View mContainer;
     private TextView mTvDay, mTvWeatherDesc, mTvLowHigh, mTvCurrTemp;
     private ImageView mIvWeatherIcon;
 
     public ForecastViewHolder(View view) {
         super(view);
 
+        mContainer = view;
         mTvDay = (TextView) view.findViewById(R.id.tvDay);
         mTvWeatherDesc = (TextView) view.findViewById(R.id.tvWeatherDesc);
         mTvLowHigh = (TextView) view.findViewById(R.id.tvLowHigh);
@@ -42,5 +44,9 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder{
 
     public void setIcon(int id){
         mIvWeatherIcon.setImageResource(id);
+    }
+
+    public View getContainer() {
+        return mContainer;
     }
 }

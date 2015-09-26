@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_location"
+        android:title="@string/pref_location"
+        android:dialogTitle="@string/pref_location"
+        android:entries="@array/pref_location_list"
+        android:entryValues="@array/pref_location_values" />
+
+    <EditTextPreference
+        android:key="pref_zipcode"
+        android:title="@string/pref_zipcode" />
+
+    <ListPreference
+        android:key="pref_metric"
+        android:title="@string/pref_metric"
+        android:dialogTitle="@string/pref_metric"
+        android:entries="@array/pref_metrics_list"
+        android:entryValues="@array/pref_metrics_values" />
+</PreferenceScreen>

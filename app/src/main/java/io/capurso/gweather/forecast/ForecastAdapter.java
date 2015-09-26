@@ -1,9 +1,11 @@
 package io.capurso.gweather.forecast;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
 import java.util.List;
 
@@ -14,9 +16,12 @@ import io.capurso.gweather.R;
  */
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
     private List<ForecastInfo> mForecastInfo;
+    private Context mContext;
 
+    private int mLastAnimated = -1;
 
-    public ForecastAdapter(List<ForecastInfo> info){
+    public ForecastAdapter(Context context, List<ForecastInfo> info){
+        mContext = context;
         mForecastInfo = info;
     }
 
@@ -35,6 +40,11 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
         holder.setLowHigh(info.lowHigh);
         holder.setCurrTemp(info.currTemp);
         holder.setIcon(info.iconId);
+
+        if(position > mLastAnimated) {
+            holder.getContainer().startAnimation(AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in));
+            mLastAnimated = position;
+        }
     }
 
     @Override

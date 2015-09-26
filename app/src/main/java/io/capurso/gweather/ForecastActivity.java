@@ -1,5 +1,6 @@
 package io.capurso.gweather;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,7 +36,7 @@ public class ForecastActivity extends AppCompatActivity {
 
         mRvForecast.setLayoutManager(new LinearLayoutManager(this));
 
-        mAdapter = new ForecastAdapter(mForecastInfo);
+        mAdapter = new ForecastAdapter(this, mForecastInfo);
         mRvForecast.setAdapter(mAdapter);
     }
 
@@ -55,7 +56,7 @@ public class ForecastActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_refresh) {
             mForecastInfo.add( new ForecastInfo(
                     getResources().getString(R.string.placeholder_day),
                     getResources().getString(R.string.placeholder_weather),
@@ -65,6 +66,8 @@ public class ForecastActivity extends AppCompatActivity {
             ));
             mAdapter.notifyDataSetChanged();
             return true;
+        }else if(id == R.id.action_settings){
+            startActivity(new Intent(this, PreferencesActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
