@@ -17,6 +17,8 @@ import io.capurso.gweather.forecast.ForecastInfo;
 
 
 public class ForecastActivity extends AppCompatActivity {
+    private static final String TAG = ForecastActivity.class.getName();
+
     private RecyclerView mRvForecast;
     private RecyclerView.Adapter mAdapter;
 
@@ -67,7 +69,7 @@ public class ForecastActivity extends AppCompatActivity {
             mAdapter.notifyDataSetChanged();
             return true;
         }else if(id == R.id.action_settings){
-            startActivity(new Intent(this, PreferencesActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);

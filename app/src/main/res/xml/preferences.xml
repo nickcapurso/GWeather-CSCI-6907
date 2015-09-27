@@ -1,20 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListPreference
-        android:key="pref_location"
-        android:title="@string/pref_location"
-        android:dialogTitle="@string/pref_location"
-        android:entries="@array/pref_location_list"
-        android:entryValues="@array/pref_location_values" />
 
-    <EditTextPreference
-        android:key="pref_zipcode"
-        android:title="@string/pref_zipcode" />
+    <PreferenceCategory
+        android:key="@string/key_location_category"
+        android:title="@string/pref_location">
 
-    <ListPreference
-        android:key="pref_metric"
-        android:title="@string/pref_metric"
-        android:dialogTitle="@string/pref_metric"
-        android:entries="@array/pref_metrics_list"
-        android:entryValues="@array/pref_metrics_values" />
+        <ListPreference
+            android:key="@string/key_location_mode"
+            android:title="@string/pref_location_mode"
+            android:summary="%s"
+            android:dialogTitle="@string/pref_location"
+            android:entries="@array/pref_location_list"
+            android:entryValues="@array/pref_location_values"
+            android:defaultValue="@string/pref_location_list_default"/>
+
+        <CheckBoxPreference
+            android:key="@string/key_zipcode_use"
+            android:title="@string/pref_zipcode_use"
+            android:summary="@string/pref_zipcode_use_desc"
+            android:defaultValue="false"/>
+
+        <EditTextPreference
+            android:dependency="@string/key_zipcode_use"
+            android:key="@string/key_zipcode_set"
+            android:title="@string/pref_zipcode_set" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/key_misc_category"
+        android:title="@string/pref_misc">
+
+        <ListPreference
+            android:key="@string/key_metric"
+            android:title="@string/pref_metric"
+            android:summary="%s"
+            android:dialogTitle="@string/pref_metric"
+            android:entries="@array/pref_metrics_list"
+            android:entryValues="@array/pref_metrics_values"
+            android:defaultValue="@string/pref_metrics_list_default"/>
+
+        <com.vanniktech.vntnumberpickerpreference.VNTNumberPickerPreference
+            xmlns:vntnumberpickerpreference="http://schemas.android.com/apk/res-auto"
+            android:defaultValue="@integer/forecast_size_default"
+            android:key="@string/key_forecast_size"
+            android:title="@string/pref_forecast_size"
+            vntnumberpickerpreference:vnt_maxValue="@integer/forecast_size_max"
+            vntnumberpickerpreference:vnt_minValue="@integer/forecast_size_min"
+            vntnumberpickerpreference:vnt_setWrapSelectorWheel="false"/>
+    </PreferenceCategory>
 </PreferenceScreen>

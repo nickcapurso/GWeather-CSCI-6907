@@ -6,13 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/blueGrey500"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
-
+    <include layout="@layout/view_toolbar"/>
     <include layout="@layout/view_shadow"/>
 
     <RelativeLayout
@@ -29,16 +23,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:paddingBottom="@dimen/default_content_margin"
+
             android:gravity="center"
             android:textSize="@dimen/text_size_h1"
             android:text="@string/placeholder_city" />
+
+        <View
+            android:id="@+id/dividerView"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/forecast_divider_height"
+            android:layout_below="@id/tvLocationName"
+            android:layout_marginTop="@dimen/default_content_margin"
+            android:layout_marginBottom="@dimen/default_content_margin"
+            android:background="@color/dark_shadow" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvForecast"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/tvLocationName"
+                android:layout_below="@id/dividerView"
                 android:scrollbars="vertical">
 
             </android.support.v7.widget.RecyclerView>

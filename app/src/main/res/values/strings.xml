@@ -8,21 +8,50 @@
     <string name="placeholder_city">Washington, D.C.</string>
     <string name="placeholder_day">Saturday</string>
     <string name="placeholder_weather">Partly Cloudy</string>
-    <string name="placeholder_lowhigh">67 F / 80 F</string>
+    <string name="placeholder_lowhigh">67 &#176;F / 80 &#176;F</string>
     <string name="placeholder_current">75 F</string>
 
+    <string name="key_location_category">key_location_category</string>
+    <string name="key_misc_category">key_misc_category</string>
+    <string name="key_location_mode">key_location_hardware</string>
+    <string name="key_zipcode_use">key_zipcode_use</string>
+    <string name="key_zipcode_set">key_zipcode_set</string>
+    <string name="key_metric">key_metric</string>
+    <string name="key_forecast_size">key_forecast_size</string>
+
     <string name="pref_location">Location</string>
+    <string name="pref_misc">Miscellaneous</string>
+    <string name="pref_location_mode">Mode</string>
+    <string name="pref_location_desc">Adjust location access modes and zipcode override</string>
     <string name="pref_metric">Temperature Metric</string>
-    <string name="pref_zipcode">Zipcode</string>
+    <string name="pref_zipcode_use">Use Zipcode</string>
+    <string name="pref_zipcode_use_desc">Use specified zipcode instead of location hardware</string>
+    <string name="pref_zipcode_set">Set Zipcode</string>
+    <string name="pref_forecast_size">Forecast Size</string>
+    <string name="pref_forecast_summary_suffix">-day forecast</string>
+
+    <string name="pref_location_list_default">0</string>
+    <string name="pref_metrics_list_default">0</string>
 
     <string-array name="pref_location_list">
         <item>GPS Only</item>
         <item>Network Only</item>
-        <item>Manual Zipcode</item>
+        <item>GPS and Network</item>
     </string-array>
 
     <string-array name="pref_metrics_list">
-        <item>Fahrenheit (F)</item>
-        <item>Celsius (C)</item>
+        <item>Fahrenheit (&#176;F)</item>
+        <item>Celsius (&#176;C)</item>
+    </string-array>
+
+    <string-array name="pref_location_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="pref_metrics_values">
+        <item>0</item>
+        <item>1</item>
     </string-array>
 </resources>

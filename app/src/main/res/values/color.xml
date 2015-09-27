@@ -2,6 +2,7 @@
 <resources>
     <color name="red500">#F44336</color>
     <color name="shadow">#b4b4b4</color>
+    <color name="dark_shadow">#A4A4A4</color>
 
     <color name="blueGrey500">#607D8B</color>
     <color name="white">#FFFFFF</color>
