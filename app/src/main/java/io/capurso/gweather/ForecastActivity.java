@@ -1,6 +1,7 @@
 package io.capurso.gweather;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,10 +34,19 @@ public class ForecastActivity extends AppCompatActivity {
 
         mForecastInfo = new ArrayList<ForecastInfo>();
 
-        mRvForecast = (RecyclerView)findViewById(R.id.rvForecast);
+        mRvForecast = (RecyclerView) findViewById(R.id.rvForecast);
         mRvForecast.setHasFixedSize(true);
 
-        mRvForecast.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            
+        }else {
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        }
+
+        mRvForecast.setLayoutManager(layoutManager);
 
         mAdapter = new ForecastAdapter(this, mForecastInfo);
         mRvForecast.setAdapter(mAdapter);
