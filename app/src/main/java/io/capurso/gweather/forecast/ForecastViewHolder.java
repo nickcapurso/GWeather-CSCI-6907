@@ -7,9 +7,7 @@ import android.widget.TextView;
 
 import io.capurso.gweather.R;
 
-/**
- * Created by cheng on 9/26/15.
- */
+
 public class ForecastViewHolder extends RecyclerView.ViewHolder{
     private View mContainer;
     private TextView mTvDay, mTvWeatherDesc, mTvLowHigh, mTvCurrTemp;

@@ -1,8 +1,6 @@
 package io.capurso.gweather.forecast;
 
-/**
- * Created by cheng on 9/26/15.
- */
+
 public class ForecastInfo {
     public String day, weatherDesc, lowHigh, currTemp;
     public int iconId;

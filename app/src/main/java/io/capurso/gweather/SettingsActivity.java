@@ -6,9 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-/**
- * Created by cheng on 9/26/15.
- */
+
 public class SettingsActivity extends AppCompatActivity{
     private static final String TAG = SettingsActivity.class.getName();
 

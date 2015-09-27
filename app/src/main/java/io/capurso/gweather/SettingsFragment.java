@@ -6,9 +6,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import static io.capurso.gweather.common.Utils.DEBUG;
-/**
- * Created by Nick on 9/26/2015.
- */
+
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = SettingsFragment.class.getName();
 

@@ -11,9 +11,6 @@ import java.util.List;
 
 import io.capurso.gweather.R;
 
-/**
- * Created by cheng on 9/26/15.
- */
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
     private List<ForecastInfo> mForecastInfo;
     private Context mContext;
