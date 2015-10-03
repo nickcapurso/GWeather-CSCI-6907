@@ -16,14 +16,22 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import io.capurso.gweather.common.Timeout;
+import io.capurso.gweather.common.TimeoutListener;
+import static io.capurso.gweather.common.Utils.DEBUG;
+
+
 /**
  * Class used to execute a network request in the from of an HTTP GET message. The class is named
  * since all APIs used return JSON objects.
  */
-public class JSONFetcher extends AsyncTask<String, Void, String> {
+public class JSONFetcher extends AsyncTask<String, Void, String> implements TimeoutListener {
     private static final String TAG = "JSONFetcher";
+    private static final String RESULT_GOOD = "success";
+    private static final String RESULT_ERR = "error";
+    private boolean mTimeoutOccurred;
     private JSONEventListener mClientListener;
-    private NetworkTimeout mTimer;
+    private Timeout mTimer;
 
     public JSONFetcher(JSONEventListener client){
         mClientListener = client;
@@ -34,7 +42,7 @@ public class JSONFetcher extends AsyncTask<String, Void, String> {
      */
     @Override
     protected void onPreExecute() {
-        mTimer = new NetworkTimeout(mClientListener);
+        mTimer = new Timeout(this);
         mTimer.start();
     }
 
@@ -54,7 +62,7 @@ public class JSONFetcher extends AsyncTask<String, Void, String> {
      */
     @Override
     protected String doInBackground(String... params) {
-        Log.d(TAG, "JSONFetcher starting...");
+        if(DEBUG) Log.d(TAG, "JSONFetcher starting...");
         HttpClient httpclient = HttpClients.createDefault();
 
         try {
@@ -69,34 +77,42 @@ public class JSONFetcher extends AsyncTask<String, Void, String> {
             HttpResponse response = httpclient.execute(request);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                //TODO
                 return (EntityUtils.toString(entity));
             }
         } catch (ClientProtocolException e) {
-            Log.d(TAG, "JSONFetcher - ClientProtocolException " + e.getStackTrace());
-            return "err";
+            if(DEBUG) Log.d(TAG, "JSONFetcher - ClientProtocolException " + e.getStackTrace());
+            return RESULT_ERR;
         } catch (IOException e) {
-            Log.d(TAG, "JSONFetcher - IOException " + e.getStackTrace());
-            return "err";
+            if(DEBUG) Log.d(TAG, "JSONFetcher - IOException " + e.getStackTrace());
+            return RESULT_ERR;
         } catch (URISyntaxException e) {
-            Log.d(TAG, "JSONFetcher - URISyntaxException " + e.getStackTrace());
-            return "err";
+            if(DEBUG) Log.d(TAG, "JSONFetcher - URISyntaxException " + e.getStackTrace());
+            return RESULT_ERR;
         }
-        return "okay";
+        return RESULT_GOOD;
     }
 
     @Override
     protected void onPostExecute(String result) {
+        if(mTimeoutOccurred)
+            return;
+
         mTimer.cancel();
         //Send the handler code for JSON fetching errors
-        if(result.equals("err")){
+        if(result.equals(RESULT_ERR)){
             mClientListener.onJSONFetchErr();
 
         //Send a handler message indicated that the fetch was successful and include the JSON result
         //as the message's contained object.
         }else {
-            Log.d(TAG, "Result: " + result);
+            if(DEBUG) Log.d(TAG, "Result: " + result);
             mClientListener.onJSONFetchSuccess(result);
         }
+    }
+
+    @Override
+    public void onTimeout() {
+        mTimeoutOccurred = true;
+        mClientListener.onNetworkTimeout();
     }
 }

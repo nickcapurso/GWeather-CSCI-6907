@@ -2,6 +2,7 @@ package io.capurso.gweather;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +18,7 @@ import io.capurso.gweather.forecast.ForecastAdapter;
 import io.capurso.gweather.forecast.ForecastInfo;
 
 
-public class ForecastActivity extends AppCompatActivity {
+public class ForecastActivity extends AppCompatActivity implements LocationBlackbox.BlackboxListener {
     private static final String TAG = ForecastActivity.class.getName();
 
     private RecyclerView mRvForecast;
@@ -39,12 +40,10 @@ public class ForecastActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            
-        }else {
+        else
             layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        }
 
         mRvForecast.setLayoutManager(layoutManager);
 
@@ -67,7 +66,7 @@ public class ForecastActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //Placeholder - refresh creates dummy data
         if (id == R.id.action_refresh) {
             mForecastInfo.add( new ForecastInfo(
                     getResources().getString(R.string.placeholder_day),
@@ -77,11 +76,22 @@ public class ForecastActivity extends AppCompatActivity {
                     R.drawable.ic_launcher
             ));
             mAdapter.notifyDataSetChanged();
+            new LocationBlackbox(this, this).getLocation();
             return true;
         }else if(id == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLocationFound(Location location) {
+
+    }
+
+    @Override
+    public void onBlackboxError() {
+
     }
 }

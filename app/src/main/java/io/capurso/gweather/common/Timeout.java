@@ -1,4 +1,4 @@
-package io.capurso.gweather.json;
+package io.capurso.gweather.common;
 
 import android.os.CountDownTimer;
 
@@ -6,7 +6,7 @@ import android.os.CountDownTimer;
  * Simple countdown timer for location and network requests. By default, the period is ten seconds.
  * When the timeout occurs, a message is sent to the "client" activity's handler.
  */
-public class NetworkTimeout extends CountDownTimer {
+public class Timeout extends CountDownTimer {
     /**
      * One second
      */
@@ -20,14 +20,14 @@ public class NetworkTimeout extends CountDownTimer {
     /**
      * Listener to receive a callback if the timeout expires
      */
-    private JSONEventListener mClientListener;
+    private TimeoutListener mClientListener;
 
-    public NetworkTimeout(long millisInFuture, long countDownInterval, JSONEventListener listener){
+    public Timeout(long millisInFuture, long countDownInterval, TimeoutListener listener){
         super(millisInFuture, countDownInterval);
         mClientListener = listener;
     }
 
-    public NetworkTimeout(JSONEventListener listener){
+    public Timeout(TimeoutListener listener){
         super(DEFAULT_PERIOD, ONE_SECOND_MILLIS);
         mClientListener = listener;
     }
@@ -40,6 +40,6 @@ public class NetworkTimeout extends CountDownTimer {
      */
     @Override
     public void onFinish() {
-        mClientListener.onNetworkTimeout();
+        mClientListener.onTimeout();
     }
 }
