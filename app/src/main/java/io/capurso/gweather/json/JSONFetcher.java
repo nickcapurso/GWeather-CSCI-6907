@@ -73,6 +73,7 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
                 builder.setParameter(params[i], params[i+1]);
 
             URI uri = builder.build();
+            if(DEBUG) Log.d(TAG, "JSONFetecher requesting: " + uri.toString());
             HttpGet request = new HttpGet(uri);
             HttpResponse response = httpclient.execute(request);
             HttpEntity entity = response.getEntity();
@@ -89,7 +90,7 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
             if(DEBUG) Log.d(TAG, "JSONFetcher - URISyntaxException " + e.getStackTrace());
             return RESULT_ERR;
         }
-        return RESULT_GOOD;
+        return RESULT_ERR;
     }
 
     @Override
@@ -98,6 +99,9 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
             return;
 
         mTimer.cancel();
+
+        if(DEBUG) Log.d(TAG, "Result: " + result);
+
         //Send the handler code for JSON fetching errors
         if(result.equals(RESULT_ERR)){
             mClientListener.onJSONFetchErr();
@@ -105,7 +109,6 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
         //Send a handler message indicated that the fetch was successful and include the JSON result
         //as the message's contained object.
         }else {
-            if(DEBUG) Log.d(TAG, "Result: " + result);
             mClientListener.onJSONFetchSuccess(result);
         }
     }

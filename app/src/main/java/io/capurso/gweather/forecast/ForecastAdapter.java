@@ -39,7 +39,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
         holder.setIcon(info.iconId);
 
         if(position > mLastAnimated) {
-            holder.getContainer().startAnimation(AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in));
+            holder.getContainer().startAnimation(AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left));
             mLastAnimated = position;
         }
     }

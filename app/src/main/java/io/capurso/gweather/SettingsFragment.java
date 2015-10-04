@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import static io.capurso.gweather.common.Utils.DEBUG;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = SettingsFragment.class.getName();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,8 +54,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             findPreference(getString(R.string.key_location_mode))
                     .setEnabled(!sharedPreferences.getBoolean(s, false));
 
-        }else if(s.equals(getString(R.string.key_forecast_size))
-                || s.equals(getString(R.string.key_zipcode_set))) {
+        }else if(s.equals(getString(R.string.key_forecast_size))){
+            refreshCustomSummaries();
+
+        }else if(s.equals(getString(R.string.key_zipcode_set))){
             refreshCustomSummaries();
         }
     }
@@ -65,4 +69,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private void setPreferenceSummary(String key, String summary){
         findPreference(key).setSummary(summary);
     }
+
+
 }
