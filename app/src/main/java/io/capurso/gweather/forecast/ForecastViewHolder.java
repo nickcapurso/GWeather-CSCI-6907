@@ -1,9 +1,12 @@
 package io.capurso.gweather.forecast;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import io.capurso.gweather.R;
 
@@ -40,8 +43,9 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder{
         mTvCurrTemp.setText(temp);
     }
 
-    public void setIcon(int id){
-        mIvWeatherIcon.setImageResource(id);
+    public void setIcon(String url, Context context){
+        //mIvWeatherIcon.setImageResource(id);
+        Picasso.with(context).load(url).into(mIvWeatherIcon);
     }
 
     public View getContainer() {

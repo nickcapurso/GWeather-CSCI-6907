@@ -36,12 +36,16 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
         holder.setWeatherDesc(info.weatherDesc);
         holder.setLowHigh(info.lowHigh);
         holder.setCurrTemp(info.currTemp);
-        holder.setIcon(info.iconId);
+        holder.setIcon(info.iconUrl, mContext);
 
         if(position > mLastAnimated) {
             holder.getContainer().startAnimation(AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left));
             mLastAnimated = position;
         }
+    }
+
+    public void resetAnimationCount(){
+        mLastAnimated = -1;
     }
 
     @Override

@@ -14,6 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.capurso.gweather.common.API_URLS;
+import io.capurso.gweather.common.Timeout;
+import io.capurso.gweather.common.TimeoutListener;
 import io.capurso.gweather.json.JSONEventListener;
 import io.capurso.gweather.json.JSONFetcher;
 
@@ -34,6 +36,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
     private LocationManager mLocationManager;
     private Context mContext;
     private BlackboxListener mClient;
+    private Timeout mLocationTimeout;
 
     public LocationBlackbox(Context context, BlackboxListener listener){
         mContext = context;
@@ -56,8 +59,10 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
         if(zipcodeOverride){
             String zipcode = mSharedPrefs.getString(mContext.getResources().getString(R.string.key_zipcode_set), "");
             verifyZipcode(zipcode);
+            return;
+        }
 
-        }else if(locationMode.equals(GPS_ONLY)){
+        if(locationMode.equals(GPS_ONLY)){
             if(!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
                 mClient.onBlackboxError(ErrorCodes.ERR_GPS_DISABLED);
                 return;
@@ -72,9 +77,24 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
 
             mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
         }else if(locationMode.equals(BOTH_GPS_NETWORK)){
+            if(!mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
+                    !mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                mClient.onBlackboxError(ErrorCodes.ERR_LOCATION_DISABLED);
+                return;
+            }
+
             mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
             mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
         }
+
+        mLocationTimeout = new Timeout(new TimeoutListener() {
+            @Override
+            public void onTimeout() {
+                mLocationManager.removeUpdates(LocationBlackbox.this);
+                mClient.onBlackboxError(ErrorCodes.ERR_LOCATION_TIMEOUT);
+            }
+        });
+        mLocationTimeout.start();
     }
 
     private LocationWrapper extractLocation(String jsonData){
@@ -131,6 +151,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
 
     @Override
     public void onLocationChanged(Location location) {
+
         mLocationManager.removeUpdates(this);
 
         //TODO string constant
@@ -171,5 +192,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
         static final byte ERR_JSON_FAILED = 0x02;
         static final byte ERR_GPS_DISABLED = 0x03;
         static final byte ERR_NETWORK_DISABLED = 0x04;
+        static final byte ERR_LOCATION_DISABLED = 0x05;
+        static final byte ERR_LOCATION_TIMEOUT = 0x06;
     }
 }

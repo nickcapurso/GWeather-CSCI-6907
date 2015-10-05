@@ -18,22 +18,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.capurso.gweather.forecast.ForecastAdapter;
 import io.capurso.gweather.forecast.ForecastInfo;
-
 
 public class ForecastActivity extends AppCompatActivity implements BlackboxListener, WeatherListener {
     private static final String TAG = ForecastActivity.class.getName();
     private static final long FORECAST_VIEW_DELAY = 300; //300 ms
 
+    private static final String BUNDLE_KEY_FORECAST_LIST = "forecastList";
+    private static final String BUNDLE_KEY_LOCATION_TITLE = "locationTitle";
+
     private LinearLayout mMainLayout;
     private RecyclerView mRvForecast;
-    private RecyclerView.Adapter mAdapter;
+    private ForecastAdapter mAdapter;
 
     private WeatherManager mWeatherManager;
-    private List<ForecastInfo> mForecastInfo;
+    private ArrayList<ForecastInfo> mForecastInfo;
 
     private Handler mHandler;
 
@@ -63,14 +64,44 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         mRvForecast.setAdapter(mAdapter);
 
         mHandler = new Handler();
+
+        if(savedInstanceState != null){
+            ArrayList<ForecastInfo> temp = savedInstanceState.getParcelableArrayList(BUNDLE_KEY_FORECAST_LIST);
+
+            if(temp == null)
+                return;
+
+            staggerInForecast(temp);
+            ((TextView)findViewById(R.id.tvLocationName)).setText(
+                    savedInstanceState.getString(BUNDLE_KEY_LOCATION_TITLE)
+            );
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle toSave){
+        if(mForecastInfo.size() == 0)
+            return;
+        String locationTitle = ((TextView)findViewById(R.id.tvLocationName)).getText().toString();
+
+        toSave.putParcelableArrayList(BUNDLE_KEY_FORECAST_LIST, mForecastInfo);
+        toSave.putString(BUNDLE_KEY_LOCATION_TITLE, locationTitle);
+        super.onSaveInstanceState(toSave);
     }
 
 
+    @Override
+    public void onWeatherReceived(ArrayList<ForecastInfo> forecast) {
+        staggerInForecast(forecast);
+    }
 
     @Override
-    public void onWeatherReceived(List<ForecastInfo> forecast) {
-        long uptime = SystemClock.uptimeMillis();
+    public void onWeatherError(byte errorCode) {
 
+    }
+
+    private void staggerInForecast(ArrayList<ForecastInfo> forecast){
+        long uptime = SystemClock.uptimeMillis();
         for(final ForecastInfo info : forecast){
             mHandler.postAtTime(new Runnable() {
                 @Override
@@ -82,17 +113,11 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         }
     }
 
-    @Override
-    public void onWeatherError(byte errorCode) {
-
-    }
-
-
 
 
     @Override
     public void onLocationFound(LocationWrapper location) {
-        mWeatherManager = new WeatherManager(this, location.location);
+        mWeatherManager = new WeatherManager(this, location.location, this);
         mWeatherManager.requestForecast();
 
         ((TextView)findViewById(R.id.tvLocationName)).setText(location.address);
@@ -115,8 +140,12 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
                 break;
             case LocationBlackbox.ErrorCodes.ERR_JSON_FAILED:
             case LocationBlackbox.ErrorCodes.ERR_NETWORK_TIMEOUT:
+            case LocationBlackbox.ErrorCodes.ERR_LOCATION_TIMEOUT:
                 //TODO string constants
-                Snackbar retryBar = Snackbar.make(mMainLayout, "Please check your internet connection", Snackbar.LENGTH_LONG);
+                String message = errCode == LocationBlackbox.ErrorCodes.ERR_LOCATION_TIMEOUT?
+                        "Could not determine location" : "Please check your internet connection";
+
+                Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_LONG);
                 retryBar.setAction("Retry", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -129,10 +158,15 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
             case LocationBlackbox.ErrorCodes.ERR_GPS_DISABLED:
             case LocationBlackbox.ErrorCodes.ERR_NETWORK_DISABLED:
-                String provider = errCode == LocationBlackbox.ErrorCodes.ERR_GPS_DISABLED ? "GPS" : "Network";
+            case LocationBlackbox.ErrorCodes.ERR_LOCATION_DISABLED:
+                String provider;
+                if(errCode != LocationBlackbox.ErrorCodes.ERR_LOCATION_DISABLED)
+                    provider = errCode == LocationBlackbox.ErrorCodes.ERR_GPS_DISABLED ? "GPS location" : "Network location";
+                else
+                    provider = "Location services ";
 
                 //TODO string constants
-                Snackbar locationBar = Snackbar.make(mMainLayout, provider + " location is not enabled", Snackbar.LENGTH_LONG);
+                Snackbar locationBar = Snackbar.make(mMainLayout, provider + " is not enabled", Snackbar.LENGTH_LONG);
                 locationBar.setAction("Fix", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -164,16 +198,47 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
         //Placeholder - refresh creates dummy data
         if (id == R.id.action_refresh) {
-         /*   mForecastInfo.add( new ForecastInfo(
-                    getResources().getString(R.string.placeholder_day),
-                    getResources().getString(R.string.placeholder_weather),
-                    getResources().getString(R.string.placeholder_lowhigh),
-                    getResources().getString(R.string.placeholder_current),
-                    R.drawable.ic_launcher
-            ));
+            mForecastInfo.clear();
             mAdapter.notifyDataSetChanged();
-            */
             new LocationBlackbox(this, this).requestLocation();
+            mAdapter.resetAnimationCount();
+/*
+            new JSONFetcher(new JSONEventListener() {
+                @Override
+                public void onNetworkTimeout() {
+
+                }
+
+                @Override
+                public void onJSONFetchErr() {
+
+                }
+
+                @Override
+                public void onJSONFetchSuccess(String result) {
+                    try {
+                        JSONObject topObj = new JSONObject(result);
+                        JSONArray imageArr = topObj.getJSONObject("responseData").getJSONArray("results");
+                        String imgUrl = imageArr.getJSONObject(0).getString("url");
+
+                        if(DEBUG) Log.d(TAG, "Image: " + imgUrl);
+
+                        ImageView banner = (ImageView)findViewById(R.id.ivLocationBanner);
+                        Picasso.with(ForecastActivity.this).load(imgUrl).into(banner);
+                        banner.setVisibility(View.VISIBLE);
+                        ViewGroup.LayoutParams params = banner.getLayoutParams();
+                        params.height = (int)getResources().getDimension(R.dimen.banner_height);
+                        banner.setLayoutParams(params);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).execute(API_URLS.GOOGLE_IMAGES, API_URLS.GOOGLE_IMAGES_QUERY, "washingtondc",
+                    API_URLS.GOOGLE_IMAGES_RESPONSES, "2");
+
+*/
             return true;
         }else if(id == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));
@@ -181,4 +246,6 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }

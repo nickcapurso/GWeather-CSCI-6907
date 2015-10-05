@@ -5,6 +5,9 @@
     <string name="refresh">Refresh</string>
     <string name="action_settings">Settings</string>
 
+    <string name="fahrenheit_symbol">&#176;F</string>
+    <string name="celsius_symbol">&#176;C</string>
+
     <string name="placeholder_city">Washington, D.C.</string>
     <string name="placeholder_day">Saturday</string>
     <string name="placeholder_weather">Partly Cloudy</string>

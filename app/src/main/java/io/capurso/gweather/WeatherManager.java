@@ -1,6 +1,10 @@
 package io.capurso.gweather;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -8,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.capurso.gweather.common.API_URLS;
 import io.capurso.gweather.forecast.ForecastInfo;
@@ -22,15 +25,31 @@ import static io.capurso.gweather.common.Utils.DEBUG;
  */
 public class WeatherManager implements JSONEventListener{
     private static final String TAG = WeatherManager.class.getName();
-    private List<ForecastInfo> mForecastInfos;
+    private ArrayList<ForecastInfo> mForecastInfos;
 
     private WeatherListener mClientListener;
     private Location mLocation;
 
-    public WeatherManager(WeatherListener clientListener, Location location){
+    private String mTempMetric;
+    private boolean mUseFahrenheit;
+    private int mDaysToShow;
+
+    public WeatherManager(WeatherListener clientListener, Location location, Context context){
         mClientListener = clientListener;
         mLocation = location;
         mForecastInfos = new ArrayList<ForecastInfo>();
+        parseWeatherPreferences(context);
+    }
+
+    private void parseWeatherPreferences(Context context){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Resources res = context.getResources();
+
+
+        String tempPref = sharedPrefs.getString(res.getString(R.string.key_metric), res.getString(R.string.pref_metrics_list_default));
+        mUseFahrenheit = tempPref.equals("0");
+        mTempMetric = mUseFahrenheit ? res.getString(R.string.fahrenheit_symbol) : res.getString(R.string.celsius_symbol);
+        mDaysToShow = sharedPrefs.getInt(res.getString(R.string.key_forecast_size), res.getInteger(R.integer.forecast_size_default));
     }
 
     public void requestForecast(){
@@ -43,7 +62,7 @@ public class WeatherManager implements JSONEventListener{
     }
 
     private ForecastInfo createForecastInfo(JSONObject json)  {
-        String day, weatherDesc, lowHigh, currTemp;
+        String day, weatherDesc, lowHigh, currTemp, iconUrl;
 
         try {
             day = json.getJSONObject("date").getString("weekday");
@@ -52,17 +71,24 @@ public class WeatherManager implements JSONEventListener{
             JSONObject tempLow = json.getJSONObject("low");
             JSONObject tempHigh = json.getJSONObject("high");
 
-            //TODO celsius
-            if(true) {
-                //TODO degrees symbol
-                lowHigh = tempLow.getString("fahrenheit") + " / " + tempHigh.getString("fahrenheit");
+            if(mUseFahrenheit) {
+                lowHigh = tempLow.getString("fahrenheit") + mTempMetric +
+                        " / " + tempHigh.getString("fahrenheit") + mTempMetric;
 
                 //TODO need to use conditions API
-                currTemp = tempLow.getString("fahrenheit");
+                currTemp = tempLow.getString("fahrenheit") + mTempMetric;
+            }else{
+                lowHigh = tempLow.getString("celsius") + mTempMetric +
+                        " / " + tempHigh.getString("celsius") + mTempMetric;
+
+                //TODO need to use conditions API
+                currTemp = tempLow.getString("celsius") + mTempMetric;
             }
 
-            if(DEBUG) Log.d(TAG, "Day = " + day + ", weather = " + weatherDesc + ", lowhigh = " + lowHigh + ", currTemp = " + currTemp);
-            return new ForecastInfo(day, weatherDesc, lowHigh, currTemp, R.drawable.ic_launcher);
+            iconUrl = json.getString("icon_url");
+
+            if(DEBUG) Log.d(TAG, "Day = " + day + ", weather = " + weatherDesc + ", lowhigh = " + lowHigh + ", iconUrl = " + iconUrl);
+            return new ForecastInfo(day, weatherDesc, lowHigh, currTemp, iconUrl);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -78,7 +104,7 @@ public class WeatherManager implements JSONEventListener{
 
             if(DEBUG) Log.d(TAG, "Forecasts available: " + forecastArr.length());
 
-            for(int i = 0; i < forecastArr.length(); i++)
+            for(int i = 0; i < forecastArr.length() && i < mDaysToShow; i++)
                 mForecastInfos.add(createForecastInfo(forecastArr.getJSONObject(i)));
 
         } catch (JSONException e) {
