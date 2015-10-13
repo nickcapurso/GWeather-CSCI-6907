@@ -1,4 +1,4 @@
-package io.capurso.gweather;
+package io.capurso.gweather.weather;
 
 import java.util.ArrayList;
 

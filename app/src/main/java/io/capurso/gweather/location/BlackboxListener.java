@@ -1,4 +1,4 @@
-package io.capurso.gweather;
+package io.capurso.gweather.location;
 
 /**
  * Created by Nick on 10/3/2015.

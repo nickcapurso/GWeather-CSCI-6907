@@ -1,4 +1,4 @@
-package io.capurso.gweather;
+package io.capurso.gweather.weather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.capurso.gweather.R;
 import io.capurso.gweather.common.API_URLS;
 import io.capurso.gweather.forecast.ForecastInfo;
 import io.capurso.gweather.json.JSONEventListener;

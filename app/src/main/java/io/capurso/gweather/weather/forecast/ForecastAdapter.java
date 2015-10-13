@@ -1,4 +1,4 @@
-package io.capurso.gweather.forecast;
+package io.capurso.gweather.weather.forecast;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

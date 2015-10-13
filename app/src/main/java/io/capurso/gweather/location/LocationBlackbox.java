@@ -1,4 +1,4 @@
-package io.capurso.gweather;
+package io.capurso.gweather.location;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,10 +9,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.capurso.gweather.R;
 import io.capurso.gweather.common.API_URLS;
 import io.capurso.gweather.common.Timeout;
 import io.capurso.gweather.common.TimeoutListener;
@@ -97,48 +97,44 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
         mLocationTimeout.start();
     }
 
-    private LocationWrapper extractLocation(String jsonData){
-        JSONObject jsonParser, addressObj;
-        JSONArray jsonArray = null;
-
-        String address = "", status;
-        double latitude, longitude;
-
+    private LocationWrapper extractWundergroundLocation(String jsonData){
+        JSONObject jsonTop, jsonLocation;
+        String address = "", searchString = "";
         Location location = new Location("");
+        double latitude, longitude;
 
         latitude = longitude = 0;
 
-        try {
-            jsonParser = new JSONObject(jsonData);
-
-            //Make sure the error status code isn't set
-            //TODO string constants
-            status = jsonParser.getString("status");
-            if(!(status.equals("OK"))) {
-
-                if(status.equals("ZERO_RESULTS"))
-                    mClient.onBlackboxError(ErrorCodes.ERR_BAD_ZIP);
-                else
-                    mClient.onBlackboxError(ErrorCodes.ERR_JSON_FAILED);
-                return null;
-            }
-
-            jsonArray = jsonParser.getJSONArray("results");
-
-            addressObj = jsonArray.getJSONObject(0);
-            address = addressObj.getString("formatted_address");
-            latitude = addressObj.getJSONObject("geometry").getJSONObject("location").getDouble("lat");
-            longitude = addressObj.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-
-            if(DEBUG) Log.d(TAG, "Zipcode: " + address + ", lat: " + latitude + ", lng: " + longitude);
+        try{
+            jsonTop = new JSONObject(jsonData);
+            jsonLocation = jsonTop.getJSONObject("location");
+            searchString = jsonLocation.getString("city") + ", " + jsonLocation.getString("state");
+            address = searchString + " " +
+                    jsonLocation.getString("zip") + ", " + jsonLocation.getString("country_name");
+            latitude = jsonLocation.getDouble("lat");
+            longitude = jsonLocation.getDouble("lon");
         } catch (JSONException e) {
+            mClient.onBlackboxError(ErrorCodes.ERR_BAD_ZIP);
             e.printStackTrace();
+            return null;
         }
 
         location.setLatitude(latitude);
         location.setLongitude(longitude);
-        return new LocationWrapper(location, address);
+        return new LocationWrapper(location, address, searchString);
     }
+
+    private void reverseGeocode(Location location){
+        if(DEBUG) Log.d(TAG, "Starting reverse geocoding");
+
+        //TODO use something mutable
+        String url = API_URLS.WUNDERGROUND + API_URLS.WUNDERGROUND_REVERSE_GEOCODE;
+        url += location.getLatitude() + "," + location.getLongitude();
+        url += API_URLS.WUNDERGROUND_FORMAT;
+
+        new JSONFetcher(this).execute(url);
+    }
+
 
     private void verifyZipcode(String zipcode){
         if(!zipcode.matches(ZIPCODE_REGEX)){
@@ -146,16 +142,18 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
             return;
         }
 
-        new JSONFetcher(this).execute(API_URLS.GEOCODING, API_URLS.GEOCODING_ADDR_PARAM, zipcode);
+        String url = API_URLS.WUNDERGROUND + API_URLS.WUNDERGROUND_REVERSE_GEOCODE;
+        url += zipcode;
+        url += API_URLS.WUNDERGROUND_FORMAT;
+
+        new JSONFetcher(this).execute(url);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
+        mLocationTimeout.cancel();
         mLocationManager.removeUpdates(this);
-
-        //TODO string constant
-        mClient.onLocationFound(new LocationWrapper(location, "Current Location"));
+        reverseGeocode(location);
     }
 
     @Override
@@ -180,7 +178,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
 
     @Override
     public void onJSONFetchSuccess(String result) {
-        LocationWrapper location = extractLocation(result);
+        LocationWrapper location = extractWundergroundLocation(result);
 
         if(location != null)
             mClient.onLocationFound(location);

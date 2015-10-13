@@ -1,4 +1,4 @@
-package io.capurso.gweather.forecast;
+package io.capurso.gweather.weather.forecast;
 
 
 import android.os.Parcel;
