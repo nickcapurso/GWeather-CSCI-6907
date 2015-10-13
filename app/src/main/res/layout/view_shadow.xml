@@ -2,6 +2,6 @@
 <View xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="@dimen/fake_shadow_height"
     android:layout_width="match_parent"
-    android:background="@color/shadow">
+    android:background="@drawable/drop_shadow">
 
 </View>

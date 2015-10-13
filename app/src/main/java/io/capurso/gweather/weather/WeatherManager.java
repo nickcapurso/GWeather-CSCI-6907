@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import io.capurso.gweather.R;
 import io.capurso.gweather.common.API_URLS;
-import io.capurso.gweather.forecast.ForecastInfo;
+import io.capurso.gweather.weather.forecast.ForecastInfo;
 import io.capurso.gweather.json.JSONEventListener;
 import io.capurso.gweather.json.JSONFetcher;
 

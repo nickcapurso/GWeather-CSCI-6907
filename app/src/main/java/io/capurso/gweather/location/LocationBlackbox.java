@@ -184,13 +184,13 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
             mClient.onLocationFound(location);
     }
 
-    class ErrorCodes{
-        static final byte ERR_BAD_ZIP = 0x00;
-        static final byte ERR_NETWORK_TIMEOUT = 0x01;
-        static final byte ERR_JSON_FAILED = 0x02;
-        static final byte ERR_GPS_DISABLED = 0x03;
-        static final byte ERR_NETWORK_DISABLED = 0x04;
-        static final byte ERR_LOCATION_DISABLED = 0x05;
-        static final byte ERR_LOCATION_TIMEOUT = 0x06;
+    public static class ErrorCodes{
+        public static final byte ERR_BAD_ZIP = 0x00;
+        public static final byte ERR_NETWORK_TIMEOUT = 0x01;
+        public static final byte ERR_JSON_FAILED = 0x02;
+        public static final byte ERR_GPS_DISABLED = 0x03;
+        public static final byte ERR_NETWORK_DISABLED = 0x04;
+        public static final byte ERR_LOCATION_DISABLED = 0x05;
+        public static final byte ERR_LOCATION_TIMEOUT = 0x06;
     }
 }

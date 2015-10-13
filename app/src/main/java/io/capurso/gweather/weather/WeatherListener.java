@@ -2,7 +2,7 @@ package io.capurso.gweather.weather;
 
 import java.util.ArrayList;
 
-import io.capurso.gweather.forecast.ForecastInfo;
+import io.capurso.gweather.weather.forecast.ForecastInfo;
 
 /**
  * Created by Nick on 10/3/2015.

@@ -15,7 +15,7 @@ public class Timeout extends CountDownTimer {
     /**
      * 15 * one second = 15 seconds
      */
-    public static final long DEFAULT_PERIOD = 10 * ONE_SECOND_MILLIS;
+    public static final long DEFAULT_PERIOD = 15 * ONE_SECOND_MILLIS;
 
     /**
      * Listener to receive a callback if the timeout expires

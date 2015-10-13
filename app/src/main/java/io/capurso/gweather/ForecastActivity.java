@@ -14,13 +14,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import io.capurso.gweather.forecast.ForecastAdapter;
-import io.capurso.gweather.forecast.ForecastInfo;
+import io.capurso.gweather.weather.forecast.ForecastAdapter;
+import io.capurso.gweather.weather.forecast.ForecastInfo;
+import io.capurso.gweather.location.BlackboxListener;
+import io.capurso.gweather.location.LocationBlackbox;
+import io.capurso.gweather.location.LocationWrapper;
+import io.capurso.gweather.weather.WeatherListener;
+import io.capurso.gweather.weather.WeatherManager;
 
 public class ForecastActivity extends AppCompatActivity implements BlackboxListener, WeatherListener {
     private static final String TAG = ForecastActivity.class.getName();
@@ -28,15 +34,18 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     private static final String BUNDLE_KEY_FORECAST_LIST = "forecastList";
     private static final String BUNDLE_KEY_LOCATION_TITLE = "locationTitle";
+    private static final String BUNDLE_KEY_LOCATION_WRAPPER = "locationWrapper";
 
     private LinearLayout mMainLayout;
     private RecyclerView mRvForecast;
     private ForecastAdapter mAdapter;
 
     private WeatherManager mWeatherManager;
+    private BannerManager mBannerManager;
     private ArrayList<ForecastInfo> mForecastInfo;
 
     private Handler mHandler;
+    private LocationWrapper mCurrLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +74,16 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
         mHandler = new Handler();
 
+        mBannerManager = new BannerManager(this, (ImageView)findViewById(R.id.ivLocationBanner));
+
         if(savedInstanceState != null){
             ArrayList<ForecastInfo> temp = savedInstanceState.getParcelableArrayList(BUNDLE_KEY_FORECAST_LIST);
 
             if(temp == null)
                 return;
+
+            mCurrLocation = (LocationWrapper)savedInstanceState.getParcelable(BUNDLE_KEY_LOCATION_WRAPPER);
+            mBannerManager.setupBanner(mCurrLocation);
 
             staggerInForecast(temp);
             ((TextView)findViewById(R.id.tvLocationName)).setText(
@@ -86,6 +100,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
         toSave.putParcelableArrayList(BUNDLE_KEY_FORECAST_LIST, mForecastInfo);
         toSave.putString(BUNDLE_KEY_LOCATION_TITLE, locationTitle);
+        toSave.putParcelable(BUNDLE_KEY_LOCATION_WRAPPER, mCurrLocation);
         super.onSaveInstanceState(toSave);
     }
 
@@ -101,7 +116,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     }
 
     private void staggerInForecast(ArrayList<ForecastInfo> forecast){
-        long uptime = SystemClock.uptimeMillis();
+        long uptime = SystemClock.uptimeMillis() + FORECAST_VIEW_DELAY;
         for(final ForecastInfo info : forecast){
             mHandler.postAtTime(new Runnable() {
                 @Override
@@ -117,8 +132,12 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     @Override
     public void onLocationFound(LocationWrapper location) {
+        mBannerManager.setupBanner(location);
+
         mWeatherManager = new WeatherManager(this, location.location, this);
         mWeatherManager.requestForecast();
+
+        mCurrLocation = location;
 
         ((TextView)findViewById(R.id.tvLocationName)).setText(location.address);
     }
@@ -202,43 +221,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             mAdapter.notifyDataSetChanged();
             new LocationBlackbox(this, this).requestLocation();
             mAdapter.resetAnimationCount();
-/*
-            new JSONFetcher(new JSONEventListener() {
-                @Override
-                public void onNetworkTimeout() {
 
-                }
-
-                @Override
-                public void onJSONFetchErr() {
-
-                }
-
-                @Override
-                public void onJSONFetchSuccess(String result) {
-                    try {
-                        JSONObject topObj = new JSONObject(result);
-                        JSONArray imageArr = topObj.getJSONObject("responseData").getJSONArray("results");
-                        String imgUrl = imageArr.getJSONObject(0).getString("url");
-
-                        if(DEBUG) Log.d(TAG, "Image: " + imgUrl);
-
-                        ImageView banner = (ImageView)findViewById(R.id.ivLocationBanner);
-                        Picasso.with(ForecastActivity.this).load(imgUrl).into(banner);
-                        banner.setVisibility(View.VISIBLE);
-                        ViewGroup.LayoutParams params = banner.getLayoutParams();
-                        params.height = (int)getResources().getDimension(R.dimen.banner_height);
-                        banner.setLayoutParams(params);
-
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).execute(API_URLS.GOOGLE_IMAGES, API_URLS.GOOGLE_IMAGES_QUERY, "washingtondc",
-                    API_URLS.GOOGLE_IMAGES_RESPONSES, "2");
-
-*/
             return true;
         }else if(id == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));

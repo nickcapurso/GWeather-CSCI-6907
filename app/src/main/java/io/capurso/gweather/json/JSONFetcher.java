@@ -81,13 +81,13 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
                 return (EntityUtils.toString(entity));
             }
         } catch (ClientProtocolException e) {
-            if(DEBUG) Log.d(TAG, "JSONFetcher - ClientProtocolException " + e.getStackTrace());
+            if(DEBUG) Log.d(TAG, "JSONFetcher - ClientProtocolException " + e.getMessage());
             return RESULT_ERR;
         } catch (IOException e) {
-            if(DEBUG) Log.d(TAG, "JSONFetcher - IOException " + e.getStackTrace());
+            if(DEBUG) Log.d(TAG, "JSONFetcher - IOException " + e.getMessage());
             return RESULT_ERR;
         } catch (URISyntaxException e) {
-            if(DEBUG) Log.d(TAG, "JSONFetcher - URISyntaxException " + e.getStackTrace());
+            if(DEBUG) Log.d(TAG, "JSONFetcher - URISyntaxException " + e.getMessage());
             return RESULT_ERR;
         }
         return RESULT_ERR;
