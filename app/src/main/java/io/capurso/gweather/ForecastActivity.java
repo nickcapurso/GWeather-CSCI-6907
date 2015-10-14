@@ -35,6 +35,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     private static final String BUNDLE_KEY_FORECAST_LIST = "forecastList";
     private static final String BUNDLE_KEY_LOCATION_TITLE = "locationTitle";
     private static final String BUNDLE_KEY_LOCATION_WRAPPER = "locationWrapper";
+    private static final String BUNDLE_KEY_CURR_TEMP = "currTemp";
 
     private LinearLayout mMainLayout;
     private RecyclerView mRvForecast;
@@ -46,6 +47,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     private Handler mHandler;
     private LocationWrapper mCurrLocation;
+    private String mCurrTemp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
         mHandler = new Handler();
 
-        mBannerManager = new BannerManager(this, (ImageView)findViewById(R.id.ivLocationBanner));
+        mBannerManager = new BannerManager(this, (ImageView)findViewById(R.id.ivLocationBanner), (TextView)findViewById(R.id.tvCurrentTemp));
 
         if(savedInstanceState != null){
             ArrayList<ForecastInfo> temp = savedInstanceState.getParcelableArrayList(BUNDLE_KEY_FORECAST_LIST);
@@ -83,7 +85,12 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
                 return;
 
             mCurrLocation = (LocationWrapper)savedInstanceState.getParcelable(BUNDLE_KEY_LOCATION_WRAPPER);
-            mBannerManager.setupBanner(mCurrLocation);
+            mCurrTemp = savedInstanceState.getString(BUNDLE_KEY_CURR_TEMP);
+
+            if(getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                mBannerManager.setupBanner(mCurrLocation);
+                mBannerManager.setCurrentTemp(mCurrTemp);
+            }
 
             staggerInForecast(temp);
             ((TextView)findViewById(R.id.tvLocationName)).setText(
@@ -101,6 +108,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         toSave.putParcelableArrayList(BUNDLE_KEY_FORECAST_LIST, mForecastInfo);
         toSave.putString(BUNDLE_KEY_LOCATION_TITLE, locationTitle);
         toSave.putParcelable(BUNDLE_KEY_LOCATION_WRAPPER, mCurrLocation);
+        toSave.putString(BUNDLE_KEY_CURR_TEMP, mCurrTemp);
         super.onSaveInstanceState(toSave);
     }
 
@@ -108,11 +116,36 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     @Override
     public void onWeatherReceived(ArrayList<ForecastInfo> forecast) {
         staggerInForecast(forecast);
+
+        mCurrTemp = mWeatherManager.getCurrTemp();
+
+        if(getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
+            mBannerManager.setCurrentTemp(mCurrTemp);
+
+        ((TextView)findViewById(R.id.tvLocationName)).setText(mCurrLocation.address);
     }
 
     @Override
     public void onWeatherError(byte errorCode) {
+        switch (errorCode){
+            case WeatherManager.ErrorCodes.ERR_JSON_FAILED:
+            case WeatherManager.ErrorCodes.ERR_NETWORK_TIMEOUT:
 
+                //TODO string constants
+                String message = "Please check your internet connection";
+
+                Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_LONG);
+                retryBar.setAction("Retry", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mWeatherManager.requestForecast();
+                    }
+                });
+
+                retryBar.show();
+
+                break;
+        }
     }
 
     private void staggerInForecast(ArrayList<ForecastInfo> forecast){
@@ -132,14 +165,13 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     @Override
     public void onLocationFound(LocationWrapper location) {
-        mBannerManager.setupBanner(location);
+        if(getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
+            mBannerManager.setupBanner(location);
 
         mWeatherManager = new WeatherManager(this, location.location, this);
         mWeatherManager.requestForecast();
 
         mCurrLocation = location;
-
-        ((TextView)findViewById(R.id.tvLocationName)).setText(location.address);
     }
 
     @Override
@@ -221,7 +253,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             mAdapter.notifyDataSetChanged();
             new LocationBlackbox(this, this).requestLocation();
             mAdapter.resetAnimationCount();
-
+            mBannerManager.hideCurrentTemp();
             return true;
         }else if(id == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));

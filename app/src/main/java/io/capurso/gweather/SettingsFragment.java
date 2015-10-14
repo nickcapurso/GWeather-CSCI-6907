@@ -25,7 +25,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private void refreshCustomSummaries(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        int forecastSize = prefs.getInt(getString(R.string.key_forecast_size), 1);
+        int forecastSize = prefs.getInt(getString(R.string.key_forecast_size), 3);
         setPreferenceSummary(R.string.key_forecast_size, forecastSize + getString(R.string.pref_forecast_summary_suffix));
 
         String zipcode = prefs.getString(getString(R.string.key_zipcode_set), "");

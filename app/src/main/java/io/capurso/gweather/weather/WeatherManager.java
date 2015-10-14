@@ -31,7 +31,7 @@ public class WeatherManager implements JSONEventListener{
     private WeatherListener mClientListener;
     private Location mLocation;
 
-    private String mTempMetric;
+    private String mTempMetric, mCurrTemp;
     private boolean mUseFahrenheit;
     private int mDaysToShow;
 
@@ -76,20 +76,20 @@ public class WeatherManager implements JSONEventListener{
                 lowHigh = tempLow.getString("fahrenheit") + mTempMetric +
                         " / " + tempHigh.getString("fahrenheit") + mTempMetric;
 
-                //TODO need to use conditions API
-                currTemp = tempLow.getString("fahrenheit") + mTempMetric;
+                //TODO
+                mCurrTemp = tempLow.getString("fahrenheit") + mTempMetric;
             }else{
                 lowHigh = tempLow.getString("celsius") + mTempMetric +
                         " / " + tempHigh.getString("celsius") + mTempMetric;
 
-                //TODO need to use conditions API
-                currTemp = tempLow.getString("celsius") + mTempMetric;
+                //TODO
+                mCurrTemp = tempLow.getString("celsius") + mTempMetric;
             }
 
             iconUrl = json.getString("icon_url");
 
             if(DEBUG) Log.d(TAG, "Day = " + day + ", weather = " + weatherDesc + ", lowhigh = " + lowHigh + ", iconUrl = " + iconUrl);
-            return new ForecastInfo(day, weatherDesc, lowHigh, currTemp, iconUrl);
+            return new ForecastInfo(day, weatherDesc, lowHigh, iconUrl);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -114,14 +114,18 @@ public class WeatherManager implements JSONEventListener{
 
     }
 
+    public String getCurrTemp(){
+        return mCurrTemp;
+    }
+
     @Override
     public void onNetworkTimeout() {
-
+        mClientListener.onWeatherError(ErrorCodes.ERR_NETWORK_TIMEOUT);
     }
 
     @Override
     public void onJSONFetchErr() {
-
+        mClientListener.onWeatherError(ErrorCodes.ERR_JSON_FAILED);
     }
 
     @Override
@@ -130,8 +134,8 @@ public class WeatherManager implements JSONEventListener{
         mClientListener.onWeatherReceived(mForecastInfos);
     }
 
-    class ErrorCodes{
-        static final byte ERR_NETWORK_TIMEOUT = 0x00;
-        static final byte ERR_JSON_FAILED = 0x01;
+    public static class ErrorCodes{
+        public static final byte ERR_NETWORK_TIMEOUT = 0x00;
+        public static final byte ERR_JSON_FAILED = 0x01;
     }
 }

@@ -5,14 +5,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class ForecastInfo implements Parcelable{
-    public String day, weatherDesc, lowHigh, currTemp;
+    public String day, weatherDesc, lowHigh;
     public String iconUrl;
 
-    public ForecastInfo(String day, String weatherDesc, String lowHigh, String currTemp, String iconUrl){
+    public ForecastInfo(String day, String weatherDesc, String lowHigh, String iconUrl){
         this.day = day;
         this.weatherDesc = weatherDesc;
         this.lowHigh = lowHigh;
-        this.currTemp = currTemp;
         this.iconUrl = iconUrl;
     }
 
@@ -20,7 +19,6 @@ public class ForecastInfo implements Parcelable{
         day = parcel.readString();
         weatherDesc = parcel.readString();
         lowHigh = parcel.readString();
-        currTemp = parcel.readString();
         iconUrl = parcel.readString();
     }
 
@@ -34,7 +32,6 @@ public class ForecastInfo implements Parcelable{
         dest.writeString(day);
         dest.writeString(weatherDesc);
         dest.writeString(lowHigh);
-        dest.writeString(currTemp);
         dest.writeString(iconUrl);
     }
 

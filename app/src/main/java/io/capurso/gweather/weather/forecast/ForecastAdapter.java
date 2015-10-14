@@ -35,7 +35,6 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
         holder.setDay(info.day);
         holder.setWeatherDesc(info.weatherDesc);
         holder.setLowHigh(info.lowHigh);
-        holder.setCurrTemp(info.currTemp);
         holder.setIcon(info.iconUrl, mContext);
 
         if(position > mLastAnimated) {

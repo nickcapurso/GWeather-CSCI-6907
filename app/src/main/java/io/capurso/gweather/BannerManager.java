@@ -1,12 +1,13 @@
 package io.capurso.gweather;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -27,29 +28,50 @@ public class BannerManager implements JSONEventListener{
     private static final String TAG = BannerManager.class.getName();
 
     private Context mContext;
-    private ImageView mImageView;
+    private ImageView mIvBanner;
+    private TextView mTvCurrTemp;
 
-    public BannerManager(Context context, ImageView view){
+    public BannerManager(Context context, ImageView iv, TextView tv){
         mContext = context;
-        mImageView = view;
+        mIvBanner = iv;
+        mTvCurrTemp = tv;
     }
 
     public void setupBanner(LocationWrapper wrapper){
-        if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-            return;
-
         new JSONFetcher(this).execute(API_URLS.GOOGLE_IMAGES, API_URLS.GOOGLE_IMAGES_QUERY, wrapper.searchString,
                 API_URLS.GOOGLE_IMAGES_RESPONSES, "6");
     }
 
+    public void setCurrentTemp(String currTemp){
+        mTvCurrTemp.setVisibility(View.VISIBLE);
+        mTvCurrTemp.setText(currTemp);
+    }
+
+    public void hideCurrentTemp(){
+        mTvCurrTemp.setVisibility(View.GONE);
+    }
+
+    private void showImageView(){
+        if(mIvBanner.getVisibility() != View.VISIBLE) {
+            mIvBanner.setVisibility(View.VISIBLE);
+            ViewGroup.LayoutParams params = mIvBanner.getLayoutParams();
+            params.height = (int) mContext.getResources().getDimension(R.dimen.banner_height);
+            mIvBanner.setLayoutParams(params);
+        }
+    }
+
+    private void showErrPlaceholder(){
+        mIvBanner.setBackgroundResource(R.drawable.placeholder);
+        showImageView();
+    }
     @Override
     public void onNetworkTimeout() {
-
+        showErrPlaceholder();
     }
 
     @Override
     public void onJSONFetchErr() {
-
+        showErrPlaceholder();
     }
 
     @Override
@@ -71,14 +93,18 @@ public class BannerManager implements JSONEventListener{
 
             if(DEBUG) Log.d(TAG, "Image chosen: " + imgUrl);
 
-            Picasso.with(mContext).load(imgUrl).placeholder(R.drawable.placeholder).into(mImageView);
+            showImageView();
 
-            mImageView.setVisibility(View.VISIBLE);
-            ViewGroup.LayoutParams params = mImageView.getLayoutParams();
-            params.height = (int)mContext.getResources().getDimension(R.dimen.banner_height);
-            mImageView.setLayoutParams(params);
+            Picasso.with(mContext).load(imgUrl).placeholder(R.drawable.placeholder).into(mIvBanner, new Callback() {
+                @Override
+                public void onSuccess() { }
 
-
+                @Override
+                public void onError() {
+                    if(DEBUG) Log.d(TAG, "Picasso failed to get image");
+                    showErrPlaceholder();
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }

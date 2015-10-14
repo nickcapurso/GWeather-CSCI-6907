@@ -13,7 +13,7 @@ import io.capurso.gweather.R;
 
 public class ForecastViewHolder extends RecyclerView.ViewHolder{
     private View mContainer;
-    private TextView mTvDay, mTvWeatherDesc, mTvLowHigh, mTvCurrTemp;
+    private TextView mTvDay, mTvWeatherDesc, mTvLowHigh;
     private ImageView mIvWeatherIcon;
 
     public ForecastViewHolder(View view) {
@@ -23,7 +23,6 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder{
         mTvDay = (TextView) view.findViewById(R.id.tvDay);
         mTvWeatherDesc = (TextView) view.findViewById(R.id.tvWeatherDesc);
         mTvLowHigh = (TextView) view.findViewById(R.id.tvLowHigh);
-        mTvCurrTemp = (TextView) view.findViewById(R.id.tvCurrentTemp);
         mIvWeatherIcon = (ImageView) view.findViewById(R.id.ivWeatherIcon);
     }
 
@@ -37,10 +36,6 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder{
 
     public void setLowHigh(String lowHigh){
         mTvLowHigh.setText(lowHigh);
-    }
-
-    public void setCurrTemp(String temp){
-        mTvCurrTemp.setText(temp);
     }
 
     public void setIcon(String url, Context context){
