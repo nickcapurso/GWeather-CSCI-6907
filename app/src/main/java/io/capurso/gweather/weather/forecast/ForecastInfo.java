@@ -5,8 +5,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class ForecastInfo implements Parcelable{
-    public String day, weatherDesc, lowHigh;
-    public String iconUrl;
+    public String day, weatherDesc, lowHigh, formalDesc, windDir, iconUrl;
+    public int aveWind, maxWind, humidity;
+    public double rainIn, snowIn;
+
+    public ForecastInfo(){
+
+    }
 
     public ForecastInfo(String day, String weatherDesc, String lowHigh, String iconUrl){
         this.day = day;
@@ -20,6 +25,13 @@ public class ForecastInfo implements Parcelable{
         weatherDesc = parcel.readString();
         lowHigh = parcel.readString();
         iconUrl = parcel.readString();
+        formalDesc = parcel.readString();
+        windDir = parcel.readString();
+        aveWind = parcel.readInt();
+        maxWind = parcel.readInt();
+        humidity = parcel.readInt();
+        rainIn = parcel.readDouble();
+        snowIn = parcel.readDouble();
     }
 
     @Override
@@ -33,6 +45,13 @@ public class ForecastInfo implements Parcelable{
         dest.writeString(weatherDesc);
         dest.writeString(lowHigh);
         dest.writeString(iconUrl);
+        dest.writeString(formalDesc);
+        dest.writeString(windDir);
+        dest.writeInt(aveWind);
+        dest.writeInt(maxWind);
+        dest.writeInt(humidity);
+        dest.writeDouble(rainIn);
+        dest.writeDouble(snowIn);
     }
 
     //Formally used to call the constructor to recreate an AddressInfo from a parcel
@@ -47,4 +66,12 @@ public class ForecastInfo implements Parcelable{
             return new ForecastInfo[size];
         }
     };
+    
+    @Override
+    public String toString(){
+        return "Day: " + day + "\nCondition: " + weatherDesc + "\nLow/High: " + lowHigh 
+                + "\nHumidity: " + humidity + "\nRain In: " + rainIn + "\nAvg Wind: " + aveWind
+                + "\nMax Wind: " + maxWind + "\nWind Dir: " + windDir + "\nSnow In: " + snowIn
+                + "\nIcon URL: " + iconUrl + "\nFull Desc: " + formalDesc;
+    }
 }

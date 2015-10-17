@@ -27,8 +27,9 @@ import io.capurso.gweather.location.LocationBlackbox;
 import io.capurso.gweather.location.LocationWrapper;
 import io.capurso.gweather.weather.WeatherListener;
 import io.capurso.gweather.weather.WeatherManager;
+import io.capurso.gweather.weather.forecast.ForecastViewHolder;
 
-public class ForecastActivity extends AppCompatActivity implements BlackboxListener, WeatherListener {
+public class ForecastActivity extends AppCompatActivity implements BlackboxListener, WeatherListener, ForecastViewHolder.ForecastViewClickListener {
     private static final String TAG = ForecastActivity.class.getName();
     private static final long FORECAST_VIEW_DELAY = 300; //300 ms
 
@@ -71,7 +72,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
         mRvForecast.setLayoutManager(layoutManager);
 
-        mAdapter = new ForecastAdapter(this, mForecastInfo);
+        mAdapter = new ForecastAdapter(this, mForecastInfo, this);
         mRvForecast.setAdapter(mAdapter);
 
         mHandler = new Handler();
@@ -84,8 +85,13 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             if(temp == null)
                 return;
 
+
+
             mCurrLocation = (LocationWrapper)savedInstanceState.getParcelable(BUNDLE_KEY_LOCATION_WRAPPER);
             mCurrTemp = savedInstanceState.getString(BUNDLE_KEY_CURR_TEMP);
+
+            mWeatherManager = new WeatherManager(this, mCurrLocation.location, this);
+            mWeatherManager.setForecastInfos(temp);
 
             if(getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
                 mBannerManager.setupBanner(mCurrLocation);
@@ -257,7 +263,9 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             mAdapter.notifyDataSetChanged();
             new LocationBlackbox(this, this).requestLocation();
             mAdapter.resetAnimationCount();
-            mBannerManager.hideCurrentTemp();
+
+            if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
+                mBannerManager.hideCurrentTemp();
             return true;
         }else if(id == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));
@@ -267,4 +275,9 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     }
 
 
+    @Override
+    public void onForecastViewClicked(int index) {
+        if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
+            mWeatherManager.getDetailDialog(index, this).show();
+    }
 }

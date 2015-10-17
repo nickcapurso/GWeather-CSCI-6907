@@ -4,6 +4,16 @@
     <string name="app_name">GWeather</string>
     <string name="refresh">Refresh</string>
     <string name="action_settings">Settings</string>
+    <string name="okay">Okay</string>
+
+    <string name="low">Low</string>
+    <string name="high">High</string>
+    <string name="humidity">Humidity</string>
+    <string name="rain">Rain</string>
+    <string name="avgwind">Avg. Wind</string>
+    <string name="maxwind">Max Wind</string>
+    <string name="winddir">Direction</string>
+    <string name="snow">Snow</string>
 
     <string name="fahrenheit_symbol">&#176;F</string>
     <string name="celsius_symbol">&#176;C</string>
@@ -13,6 +23,11 @@
     <string name="placeholder_weather">Partly Cloudy</string>
     <string name="placeholder_lowhigh">67 &#176;F / 80 &#176;F</string>
     <string name="placeholder_current">75 F</string>
+
+    <string name="placeholder_fullDesc">Considerable cloudiness with occasional rain showers. High near 50F. Winds NW at 10 to 15 mph. Chance of rain 40%.</string>
+    <string name="placeholder_humidity">54%</string>
+    <string name="placeholder_wind">15 mph</string>
+    <string name="placeholder_wind_dir">WNW</string>
 
     <string name="key_location_category">key_location_category</string>
     <string name="key_misc_category">key_misc_category</string>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/detailHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/default_content_margin"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/detail_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher"/>
+
+        <TextView
+            android:id="@+id/detail_day_condition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Saturday - Clear"
+            android:textSize="@dimen/text_size_h1"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/forecast_details_divider_height"
+        android:layout_marginLeft="@dimen/default_content_margin"
+        android:layout_marginRight="@dimen/default_content_margin"
+        android:background="@color/shadow" />
+
+    <TextView
+        android:id="@+id/detail_full_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/default_content_margin"
+        android:text="@string/placeholder_fullDesc"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/default_content_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/lbl_detail_low"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/low"/>
+
+            <TextView
+                android:id="@+id/lbl_detail_high"
+                android:layout_below="@id/lbl_detail_low"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/high"/>
+
+            <TextView
+                android:id="@+id/lbl_detail_humidity"
+                android:layout_below="@id/lbl_detail_high"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/humidity"/>
+
+            <TextView
+                android:id="@+id/lbl_detail_rain"
+                android:layout_below="@id/lbl_detail_humidity"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rain"/>
+
+
+            <!-- Values -->
+            <TextView
+                android:id="@+id/value_detail_low"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50 F"/>
+
+            <TextView
+                android:id="@+id/value_detail_high"
+                android:layout_below="@id/value_detail_low"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="75 F"/>
+
+            <TextView
+                android:id="@+id/value_detail_humidity"
+                android:layout_below="@id/value_detail_high"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="75%"/>
+
+            <TextView
+                android:id="@+id/value_detail_rain"
+                android:layout_below="@id/value_detail_humidity"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00 in"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:padding="@dimen/default_content_margin"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/lbl_detail_avgwind"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/avgwind"/>
+
+            <TextView
+                android:id="@+id/lbl_detail_maxwind"
+                android:layout_below="@id/lbl_detail_avgwind"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/maxwind"/>
+
+            <TextView
+                android:id="@+id/lbl_detail_winddir"
+                android:layout_below="@id/lbl_detail_maxwind"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/winddir"/>
+
+            <TextView
+                android:id="@+id/lbl_detail_snow"
+                android:layout_below="@id/lbl_detail_winddir"
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/snow"/>
+
+
+            <!-- Values -->
+            <TextView
+                android:id="@+id/value_detail_avgwind"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50 F"/>
+
+            <TextView
+                android:id="@+id/value_detail_maxwind"
+                android:layout_below="@id/value_detail_avgwind"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="75 F"/>
+
+            <TextView
+                android:id="@+id/value_detail_winddir"
+                android:layout_below="@id/value_detail_maxwind"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="75%"/>
+
+            <TextView
+                android:id="@+id/value_detail_snow"
+                android:layout_below="@id/value_detail_winddir"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00 in"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

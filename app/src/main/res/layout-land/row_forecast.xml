@@ -1,78 +1,100 @@
-
-<android.support.v7.widget.CardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_marginTop="@dimen/default_margin"
-    android:layout_marginBottom="@dimen/default_margin"
-    android:layout_width="300dp"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvDay"
-            android:text="@string/placeholder_day"
-            android:textSize="@dimen/text_size_h2"
+    <android.support.v7.widget.CardView
+
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/default_margin"
-            android:gravity="center_horizontal"/>
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/forecast_details_divider_height"
-            android:layout_marginLeft="@dimen/default_content_margin"
-            android:layout_marginRight="@dimen/default_content_margin"
-            android:background="@color/shadow" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/ivWeatherIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:padding="@dimen/default_content_margin"
-                android:src="@drawable/ic_launcher"/>
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvWeatherDesc"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvDay"
+                android:text="@string/placeholder_day"
+                android:textSize="@dimen/text_size_h2"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/ivWeatherIcon"
-                android:layout_centerVertical="true"
-                android:padding="@dimen/default_content_margin"
-                android:text="@string/placeholder_weather"
-                android:textSize="@dimen/text_size_h2"/>
+                android:padding="@dimen/default_margin"
+                android:gravity="center_horizontal"/>
 
-            <LinearLayout
+            <View
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:padding="@dimen/default_content_margin"
-                android:layout_centerVertical="true"
-                android:orientation="vertical">
+                android:layout_height="@dimen/forecast_details_divider_height"
+                android:layout_marginLeft="@dimen/default_content_margin"
+                android:layout_marginRight="@dimen/default_content_margin"
+                android:background="@color/shadow" />
 
-                <TextView
-                    android:id="@+id/tvLowHigh"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivWeatherIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/placeholder_lowhigh"/>
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/default_content_margin"
+                    android:src="@drawable/ic_launcher"/>
 
                 <TextView
-                    android:id="@+id/tvCurrentTemp"
+                    android:id="@+id/tvWeatherDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/placeholder_current"/>
-            </LinearLayout>
-        </RelativeLayout>
-    </LinearLayout>
-</android.support.v7.widget.CardView>
+                    android:layout_toRightOf="@id/ivWeatherIcon"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/default_content_margin"
+                    android:text="@string/placeholder_weather"
+                    android:textSize="@dimen/text_size_h2"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:padding="@dimen/default_content_margin"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvLowHigh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/placeholder_lowhigh"/>
+
+                    <TextView
+                        android:id="@+id/tvCurrentTemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/placeholder_current"/>
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+
+        android:layout_marginBottom="@dimen/default_margin"
+        android:layout_width="300dp"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <include layout="@layout/view_forecast_detail"/>
+        </ScrollView>
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>

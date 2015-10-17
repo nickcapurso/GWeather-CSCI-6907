@@ -32,4 +32,5 @@ dependencies {
     compile 'com.android.support:design:22.2.1'
     compile 'com.vanniktech:vntnumberpickerpreference:0.2.0-SNAPSHOT'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.sothree.slidinguppanel:library:3.2.0'
 }
