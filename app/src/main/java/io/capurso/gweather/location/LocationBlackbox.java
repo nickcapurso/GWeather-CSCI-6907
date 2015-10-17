@@ -103,10 +103,14 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
         Location location = new Location("");
         double latitude, longitude;
 
-        latitude = longitude = 0;
-
         try{
             jsonTop = new JSONObject(jsonData);
+
+            if(jsonTop.has("error")){
+                mClient.onBlackboxError(ErrorCodes.ERR_BAD_ZIP);
+                return null;
+            }
+
             jsonLocation = jsonTop.getJSONObject("location");
             searchString = jsonLocation.getString("city") + ", " + jsonLocation.getString("state");
             address = searchString + " " +
@@ -114,7 +118,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
             latitude = jsonLocation.getDouble("lat");
             longitude = jsonLocation.getDouble("lon");
         } catch (JSONException e) {
-            mClient.onBlackboxError(ErrorCodes.ERR_BAD_ZIP);
+            mClient.onBlackboxError(ErrorCodes.ERR_JSON_FAILED);
             e.printStackTrace();
             return null;
         }

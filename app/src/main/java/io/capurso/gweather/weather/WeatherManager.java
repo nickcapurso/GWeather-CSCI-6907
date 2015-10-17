@@ -26,6 +26,10 @@ import static io.capurso.gweather.common.Utils.DEBUG;
  */
 public class WeatherManager implements JSONEventListener{
     private static final String TAG = WeatherManager.class.getName();
+    private static final byte STATE_GET_FORECAST = 0x00;
+    private static final byte STATE_GET_CONDITIONS = 0x01;
+
+
     private ArrayList<ForecastInfo> mForecastInfos;
 
     private WeatherListener mClientListener;
@@ -34,6 +38,8 @@ public class WeatherManager implements JSONEventListener{
     private String mTempMetric, mCurrTemp;
     private boolean mUseFahrenheit;
     private int mDaysToShow;
+
+    private byte mState;
 
     public WeatherManager(WeatherListener clientListener, Location location, Context context){
         mClientListener = clientListener;
@@ -59,6 +65,17 @@ public class WeatherManager implements JSONEventListener{
         url += mLocation.getLatitude() + "," + mLocation.getLongitude();
         url += API_URLS.WUNDERGROUND_FORMAT;
 
+        mState = STATE_GET_FORECAST;
+        new JSONFetcher(this).execute(url);
+    }
+
+    public void requestCurrentTemp(){
+        //TODO use something mutable
+        String url = API_URLS.WUNDERGROUND + API_URLS.WUNDERGROUND_CONDITIONS;
+        url += mLocation.getLatitude() + "," + mLocation.getLongitude();
+        url += API_URLS.WUNDERGROUND_FORMAT;
+
+        mState = STATE_GET_CONDITIONS;
         new JSONFetcher(this).execute(url);
     }
 
@@ -75,15 +92,9 @@ public class WeatherManager implements JSONEventListener{
             if(mUseFahrenheit) {
                 lowHigh = tempLow.getString("fahrenheit") + mTempMetric +
                         " / " + tempHigh.getString("fahrenheit") + mTempMetric;
-
-                //TODO
-                mCurrTemp = tempLow.getString("fahrenheit") + mTempMetric;
             }else{
                 lowHigh = tempLow.getString("celsius") + mTempMetric +
                         " / " + tempHigh.getString("celsius") + mTempMetric;
-
-                //TODO
-                mCurrTemp = tempLow.getString("celsius") + mTempMetric;
             }
 
             iconUrl = json.getString("icon_url");
@@ -114,6 +125,18 @@ public class WeatherManager implements JSONEventListener{
 
     }
 
+    private void parseCurrentConditions(String jsonString){
+        try {
+            JSONObject result = new JSONObject(jsonString);
+            JSONObject conditionsTop = result.getJSONObject("current_observation");
+
+            mCurrTemp = "" + (mUseFahrenheit ? conditionsTop.getDouble("temp_f") : conditionsTop.getDouble("temp_c"));
+            mCurrTemp += mTempMetric;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getCurrTemp(){
         return mCurrTemp;
     }
@@ -130,8 +153,17 @@ public class WeatherManager implements JSONEventListener{
 
     @Override
     public void onJSONFetchSuccess(String result) {
-        parseJsonForecast(result);
-        mClientListener.onWeatherReceived(mForecastInfos);
+        switch(mState){
+            case STATE_GET_FORECAST:
+                parseJsonForecast(result);
+                mClientListener.onForecastReceived(mForecastInfos);
+                break;
+            case STATE_GET_CONDITIONS:
+                parseCurrentConditions(result);
+                mClientListener.onCurrentTempReceived(mCurrTemp);
+                break;
+        }
+
     }
 
     public static class ErrorCodes{

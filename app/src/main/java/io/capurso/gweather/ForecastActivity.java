@@ -114,15 +114,19 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
 
     @Override
-    public void onWeatherReceived(ArrayList<ForecastInfo> forecast) {
+    public void onForecastReceived(ArrayList<ForecastInfo> forecast) {
         staggerInForecast(forecast);
+        ((TextView)findViewById(R.id.tvLocationName)).setText(mCurrLocation.address);
 
+        mWeatherManager.requestCurrentTemp();
+    }
+
+    @Override
+    public void onCurrentTempReceived(String temp) {
         mCurrTemp = mWeatherManager.getCurrTemp();
 
         if(getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
             mBannerManager.setCurrentTemp(mCurrTemp);
-
-        ((TextView)findViewById(R.id.tvLocationName)).setText(mCurrLocation.address);
     }
 
     @Override
