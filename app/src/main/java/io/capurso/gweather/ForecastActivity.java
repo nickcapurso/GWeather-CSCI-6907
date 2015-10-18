@@ -39,6 +39,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     private static final String BUNDLE_KEY_CURR_TEMP = "currTemp";
 
     private LinearLayout mMainLayout;
+
     private RecyclerView mRvForecast;
     private ForecastAdapter mAdapter;
 
@@ -279,5 +280,77 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     public void onForecastViewClicked(int index) {
         if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
             mWeatherManager.getDetailDialog(index, this).show();
+    }
+
+    public LinearLayout getMainLayout() {
+        return mMainLayout;
+    }
+
+    public void setMainLayout(LinearLayout mainLayout) {
+        mMainLayout = mainLayout;
+    }
+
+    public RecyclerView getRvForecast() {
+        return mRvForecast;
+    }
+
+    public void setRvForecast(RecyclerView rvForecast) {
+        mRvForecast = rvForecast;
+    }
+
+    public ForecastAdapter getAdapter() {
+        return mAdapter;
+    }
+
+    public void setAdapter(ForecastAdapter adapter) {
+        mAdapter = adapter;
+    }
+
+    public WeatherManager getWeatherManager() {
+        return mWeatherManager;
+    }
+
+    public void setWeatherManager(WeatherManager weatherManager) {
+        mWeatherManager = weatherManager;
+    }
+
+    public BannerManager getBannerManager() {
+        return mBannerManager;
+    }
+
+    public void setBannerManager(BannerManager bannerManager) {
+        mBannerManager = bannerManager;
+    }
+
+    public ArrayList<ForecastInfo> getForecastInfo() {
+        return mForecastInfo;
+    }
+
+    public void setForecastInfo(ArrayList<ForecastInfo> forecastInfo) {
+        mForecastInfo = forecastInfo;
+    }
+
+    public Handler getHandler() {
+        return mHandler;
+    }
+
+    public void setHandler(Handler handler) {
+        mHandler = handler;
+    }
+
+    public LocationWrapper getCurrLocation() {
+        return mCurrLocation;
+    }
+
+    public void setCurrLocation(LocationWrapper currLocation) {
+        mCurrLocation = currLocation;
+    }
+
+    public String getCurrTemp() {
+        return mCurrTemp;
+    }
+
+    public void setCurrTemp(String currTemp) {
+        mCurrTemp = currTemp;
     }
 }
