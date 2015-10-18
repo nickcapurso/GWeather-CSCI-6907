@@ -6,8 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import io.capurso.gweather.common.Utils;
 
-public class SettingsActivity extends AppCompatActivity{
+
+public class SettingsActivity extends AppCompatActivity implements SettingsFragment.onSettingsChangedListener{
     private static final String TAG = SettingsActivity.class.getName();
 
     @Override
@@ -18,7 +20,7 @@ public class SettingsActivity extends AppCompatActivity{
         setupActionBar();
 
         getFragmentManager().beginTransaction()
-                .add(R.id.topLayout, new SettingsFragment())
+                .add(R.id.topLayout, new SettingsFragment(this))
                 .commit();
     }
 
@@ -39,5 +41,11 @@ public class SettingsActivity extends AppCompatActivity{
                 }
             });
         }
+    }
+
+    @Override
+    public void onSettingChanged(boolean requiresRefresh) {
+        if(requiresRefresh)
+            setResult(Utils.CODE_REFRESH_FORECAST);
     }
 }

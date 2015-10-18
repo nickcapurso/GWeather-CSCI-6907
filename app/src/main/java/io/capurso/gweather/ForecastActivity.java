@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import io.capurso.gweather.common.Utils;
 import io.capurso.gweather.location.BlackboxListener;
 import io.capurso.gweather.location.LocationBlackbox;
 import io.capurso.gweather.location.LocationWrapper;
@@ -65,7 +66,6 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_forecast);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -133,7 +133,8 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     @Override
     public void onSaveInstanceState(Bundle toSave){
         super.onSaveInstanceState(toSave);
-        mProgressDialog.cancel();
+        if(mProgressDialog != null)
+            mProgressDialog.cancel();
 
         if(mWeatherManager != null)
             mWeatherManager.cancel();
@@ -185,12 +186,10 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         switch (errorCode){
             case WeatherManager.ErrorCodes.ERR_JSON_FAILED:
             case WeatherManager.ErrorCodes.ERR_NETWORK_TIMEOUT:
-
-                //TODO string constants
-                String message = "Please check your internet connection";
+                String message = getString(R.string.error_internet);
 
                 Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_LONG);
-                retryBar.setAction("Retry", new View.OnClickListener() {
+                retryBar.setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         mWeatherManager.requestForecast();
@@ -234,8 +233,8 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         switch (errCode){
             case LocationBlackbox.ErrorCodes.ERR_BAD_ZIP:
                 //TODO string constants
-                Snackbar fixBar = Snackbar.make(mMainLayout, "Invalid zipcode", Snackbar.LENGTH_LONG);
-                fixBar.setAction("Fix", new View.OnClickListener() {
+                Snackbar fixBar = Snackbar.make(mMainLayout, getString(R.string.error_zipcode), Snackbar.LENGTH_LONG);
+                fixBar.setAction(getString(R.string.fix), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         startActivity(new Intent(ForecastActivity.this, SettingsActivity.class));
@@ -247,12 +246,11 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             case LocationBlackbox.ErrorCodes.ERR_JSON_FAILED:
             case LocationBlackbox.ErrorCodes.ERR_NETWORK_TIMEOUT:
             case LocationBlackbox.ErrorCodes.ERR_LOCATION_TIMEOUT:
-                //TODO string constants
                 String message = errCode == LocationBlackbox.ErrorCodes.ERR_LOCATION_TIMEOUT?
-                        "Could not determine location" : "Please check your internet connection";
+                        getString(R.string.error_determine_location) : getString(R.string.error_internet);
 
                 Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_LONG);
-                retryBar.setAction("Retry", new View.OnClickListener() {
+                retryBar.setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ( mLocationBlackbox = new LocationBlackbox(ForecastActivity.this, ForecastActivity.this)).requestLocation();
@@ -267,19 +265,16 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             case LocationBlackbox.ErrorCodes.ERR_LOCATION_DISABLED:
                 String provider;
                 if(errCode != LocationBlackbox.ErrorCodes.ERR_LOCATION_DISABLED)
-                    provider = errCode == LocationBlackbox.ErrorCodes.ERR_GPS_DISABLED ? "GPS location" : "Network location";
+                    provider = errCode == LocationBlackbox.ErrorCodes.ERR_GPS_DISABLED ? getString(R.string.gps_location) : getString(R.string.network_location);
                 else
-                    provider = "Location services ";
+                    provider = getString(R.string.location_services);
 
-                //TODO string constants
-                Snackbar locationBar = Snackbar.make(mMainLayout, provider + " is not enabled", Snackbar.LENGTH_LONG);
-                locationBar.setAction("Fix", new View.OnClickListener() {
+                Snackbar locationBar = Snackbar.make(mMainLayout, provider + getString(R.string.is_not_enabled), Snackbar.LENGTH_LONG);
+                locationBar.setAction(getString(R.string.fix), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-
-                        //TODO forResult
-                        startActivity(intent);
+                        startActivityForResult(intent, Utils.CODE_ENABLE_LOCATION);
                     }
                 });
 
@@ -305,10 +300,18 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             refreshForecast();
             return true;
         }else if(id == R.id.action_settings){
-            startActivity(new Intent(this, SettingsActivity.class));
+            startActivityForResult(new Intent(this, SettingsActivity.class), 0);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(DEBUG) Log.d(TAG, "Received code: " + resultCode);
+
+        if(requestCode == Utils.CODE_ENABLE_LOCATION || resultCode == Utils.CODE_REFRESH_FORECAST)
+            refreshForecast();
     }
 
 
@@ -331,7 +334,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     private void setLoadingState(){
         mLoadingData = true;
-        mProgressDialog = ProgressDialog.show(this, "Please Wait...", "Getting Your Weather Forecast...", true);
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.please_wait), getString(R.string.loading_forecast), true);
     }
 
     private void setNotLoadingState(){

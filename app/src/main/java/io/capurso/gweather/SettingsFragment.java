@@ -10,7 +10,17 @@ import static io.capurso.gweather.common.Utils.DEBUG;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = SettingsFragment.class.getName();
+    private onSettingsChangedListener mListener;
 
+    public interface onSettingsChangedListener{
+        void onSettingChanged(boolean requiresRefresh);
+    }
+
+    public SettingsFragment(){}
+
+    public SettingsFragment(onSettingsChangedListener listener){
+        mListener = listener;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,13 +60,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if(DEBUG) Log.d(TAG, s);
 
+        mListener.onSettingChanged(!s.equals(getString(R.string.key_location_mode)));
+
         if(s.equals(getString(R.string.key_zipcode_use))) {
             findPreference(getString(R.string.key_location_mode))
                     .setEnabled(!sharedPreferences.getBoolean(s, false));
 
         }else if(s.equals(getString(R.string.key_forecast_size))){
             refreshCustomSummaries();
-
         }else if(s.equals(getString(R.string.key_zipcode_set))){
             refreshCustomSummaries();
         }

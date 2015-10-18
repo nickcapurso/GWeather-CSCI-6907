@@ -108,8 +108,8 @@ public class WeatherManager implements JSONEventListener{
             JSONObject tempLow = simpleForecast.getJSONObject("low");
             JSONObject tempHigh = simpleForecast.getJSONObject("high");
 
-            info.lowHigh = tempLow.getString(mTemperatureMetric) + mAbbrTemp +
-                    " / " + tempHigh.getString(mTemperatureMetric) + mAbbrTemp;
+            info.lowHigh = tempLow.getString(mTemperatureMetric) + " " + mAbbrTemp +
+                    " / " + tempHigh.getString(mTemperatureMetric) + " " + mAbbrTemp;
             info.iconUrl = simpleForecast.getString("icon_url");
             info.rainIn = simpleForecast.getJSONObject("qpf_allday").getDouble(mHeightMetric);
             info.snowIn = simpleForecast.getJSONObject("snow_allday").getDouble(mHeightMetric2);
@@ -152,8 +152,8 @@ public class WeatherManager implements JSONEventListener{
             JSONObject result = new JSONObject(jsonString);
             JSONObject conditionsTop = result.getJSONObject("current_observation");
 
-            mCurrTemp = "" + (mUseImperialSystem ? conditionsTop.getDouble("temp_f") : conditionsTop.getDouble("temp_c"));
-            mCurrTemp += mAbbrTemp;
+            mCurrTemp = "" + (mUseImperialSystem ? conditionsTop.getInt("temp_f") : conditionsTop.getInt("temp_c"));
+            mCurrTemp += " " + mAbbrTemp;
         } catch (JSONException e) {
             e.printStackTrace();
         }
