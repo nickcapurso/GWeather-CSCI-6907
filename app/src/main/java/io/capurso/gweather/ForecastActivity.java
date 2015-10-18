@@ -1,5 +1,6 @@
 package io.capurso.gweather;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,16 +22,18 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import io.capurso.gweather.weather.forecast.ForecastAdapter;
-import io.capurso.gweather.weather.forecast.ForecastInfo;
 import io.capurso.gweather.location.BlackboxListener;
 import io.capurso.gweather.location.LocationBlackbox;
 import io.capurso.gweather.location.LocationWrapper;
 import io.capurso.gweather.weather.WeatherListener;
 import io.capurso.gweather.weather.WeatherManager;
-import io.capurso.gweather.weather.forecast.ForecastViewHolder;
+import io.capurso.gweather.weather.forecast.ForecastAdapter;
+import io.capurso.gweather.weather.forecast.ForecastInfo;
+import io.capurso.gweather.weather.forecast.ForecastViewClickListener;
 
-public class ForecastActivity extends AppCompatActivity implements BlackboxListener, WeatherListener, ForecastViewHolder.ForecastViewClickListener {
+import static io.capurso.gweather.common.Utils.DEBUG;
+
+public class ForecastActivity extends AppCompatActivity implements BlackboxListener, WeatherListener, ForecastViewClickListener {
     private static final String TAG = ForecastActivity.class.getName();
     private static final long FORECAST_VIEW_DELAY = 300; //300 ms
 
@@ -37,10 +41,13 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     private static final String BUNDLE_KEY_LOCATION_TITLE = "locationTitle";
     private static final String BUNDLE_KEY_LOCATION_WRAPPER = "locationWrapper";
     private static final String BUNDLE_KEY_CURR_TEMP = "currTemp";
+    private static final String BUNDLE_KEY_LOADING = "loadingForecast";
 
     private LinearLayout mMainLayout;
 
     private RecyclerView mRvForecast;
+
+    private LinearLayoutManager mRecyclerLayoutManager;
     private ForecastAdapter mAdapter;
 
     private WeatherManager mWeatherManager;
@@ -51,9 +58,14 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     private LocationWrapper mCurrLocation;
     private String mCurrTemp;
 
+    private ProgressDialog mProgressDialog;
+    private boolean mLoadingData;
+    private LocationBlackbox mLocationBlackbox;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_forecast);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -64,14 +76,14 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         mRvForecast = (RecyclerView) findViewById(R.id.rvForecast);
         mRvForecast.setHasFixedSize(true);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerLayoutManager = new LinearLayoutManager(this);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            mRecyclerLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         else
-            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            mRecyclerLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mRvForecast.setLayoutManager(layoutManager);
+        mRvForecast.setLayoutManager(mRecyclerLayoutManager);
 
         mAdapter = new ForecastAdapter(this, mForecastInfo, this);
         mRvForecast.setAdapter(mAdapter);
@@ -81,12 +93,16 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         mBannerManager = new BannerManager(this, (ImageView)findViewById(R.id.ivLocationBanner), (TextView)findViewById(R.id.tvCurrentTemp));
 
         if(savedInstanceState != null){
+            if(savedInstanceState.getBoolean(BUNDLE_KEY_LOADING)){
+                if(DEBUG) Log.d(TAG, "Was in the middle of loading forecast, restarting");
+                refreshForecast();
+                return;
+            }
+
             ArrayList<ForecastInfo> temp = savedInstanceState.getParcelableArrayList(BUNDLE_KEY_FORECAST_LIST);
 
             if(temp == null)
                 return;
-
-
 
             mCurrLocation = (LocationWrapper)savedInstanceState.getParcelable(BUNDLE_KEY_LOCATION_WRAPPER);
             mCurrTemp = savedInstanceState.getString(BUNDLE_KEY_CURR_TEMP);
@@ -100,29 +116,55 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             }
 
             staggerInForecast(temp);
-            ((TextView)findViewById(R.id.tvLocationName)).setText(
-                    savedInstanceState.getString(BUNDLE_KEY_LOCATION_TITLE)
-            );
+
+            TextView tvLocationName = ((TextView)findViewById(R.id.tvLocationName));
+            View dividerView = findViewById(R.id.dividerView);
+
+            tvLocationName.setVisibility(View.VISIBLE);
+            dividerView.setVisibility(View.VISIBLE);
+            ((TextView)findViewById(R.id.tvLocationName)).setText(savedInstanceState.getString(BUNDLE_KEY_LOCATION_TITLE));
+
+            return;
         }
+
+        refreshForecast();
     }
 
     @Override
     public void onSaveInstanceState(Bundle toSave){
-        if(mForecastInfo.size() == 0)
+        super.onSaveInstanceState(toSave);
+        mProgressDialog.cancel();
+
+        if(mWeatherManager != null)
+            mWeatherManager.cancel();
+
+        if(mLocationBlackbox != null)
+            mLocationBlackbox.cancel();
+
+        if(mForecastInfo.size() == 0){
+            toSave.putBoolean(BUNDLE_KEY_LOADING, mLoadingData);
             return;
+        }
         String locationTitle = ((TextView)findViewById(R.id.tvLocationName)).getText().toString();
 
         toSave.putParcelableArrayList(BUNDLE_KEY_FORECAST_LIST, mForecastInfo);
         toSave.putString(BUNDLE_KEY_LOCATION_TITLE, locationTitle);
         toSave.putParcelable(BUNDLE_KEY_LOCATION_WRAPPER, mCurrLocation);
         toSave.putString(BUNDLE_KEY_CURR_TEMP, mCurrTemp);
-        super.onSaveInstanceState(toSave);
+        toSave.putBoolean(BUNDLE_KEY_LOADING, mLoadingData);
     }
 
 
     @Override
     public void onForecastReceived(ArrayList<ForecastInfo> forecast) {
+        setNotLoadingState();
         staggerInForecast(forecast);
+
+        TextView tvLocationName = ((TextView)findViewById(R.id.tvLocationName));
+        View dividerView = findViewById(R.id.dividerView);
+
+        tvLocationName.setVisibility(View.VISIBLE);
+        dividerView.setVisibility(View.VISIBLE);
         ((TextView)findViewById(R.id.tvLocationName)).setText(mCurrLocation.address);
 
         mWeatherManager.requestCurrentTemp();
@@ -138,6 +180,8 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     @Override
     public void onWeatherError(byte errorCode) {
+        setNotLoadingState();
+
         switch (errorCode){
             case WeatherManager.ErrorCodes.ERR_JSON_FAILED:
             case WeatherManager.ErrorCodes.ERR_NETWORK_TIMEOUT:
@@ -172,8 +216,6 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         }
     }
 
-
-
     @Override
     public void onLocationFound(LocationWrapper location) {
         if(getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
@@ -187,6 +229,8 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     @Override
     public void onBlackboxError(byte errCode) {
+        setNotLoadingState();
+
         switch (errCode){
             case LocationBlackbox.ErrorCodes.ERR_BAD_ZIP:
                 //TODO string constants
@@ -211,7 +255,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
                 retryBar.setAction("Retry", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        new LocationBlackbox(ForecastActivity.this, ForecastActivity.this).requestLocation();
+                        ( mLocationBlackbox = new LocationBlackbox(ForecastActivity.this, ForecastActivity.this)).requestLocation();
                     }
                 });
 
@@ -253,20 +297,12 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //Placeholder - refresh creates dummy data
         if (id == R.id.action_refresh) {
-            mForecastInfo.clear();
-            mAdapter.notifyDataSetChanged();
-            new LocationBlackbox(this, this).requestLocation();
-            mAdapter.resetAnimationCount();
+            if(mLoadingData)
+                return false;
 
-            if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
-                mBannerManager.hideCurrentTemp();
+            refreshForecast();
             return true;
         }else if(id == R.id.action_settings){
             startActivity(new Intent(this, SettingsActivity.class));
@@ -282,28 +318,37 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             mWeatherManager.getDetailDialog(index, this).show();
     }
 
-    public LinearLayout getMainLayout() {
-        return mMainLayout;
+    private void refreshForecast(){
+        setLoadingState();
+        mForecastInfo.clear();
+        mAdapter.notifyDataSetChanged();
+        (mLocationBlackbox = new LocationBlackbox(this, this)).requestLocation();
+        mAdapter.resetAnimationCount();
+
+        if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE)
+            mBannerManager.hideCurrentTemp();
     }
 
-    public void setMainLayout(LinearLayout mainLayout) {
-        mMainLayout = mainLayout;
+    private void setLoadingState(){
+        mLoadingData = true;
+        mProgressDialog = ProgressDialog.show(this, "Please Wait...", "Getting Your Weather Forecast...", true);
     }
 
-    public RecyclerView getRvForecast() {
-        return mRvForecast;
+    private void setNotLoadingState(){
+        mLoadingData = false;
+        mProgressDialog.cancel();
     }
 
-    public void setRvForecast(RecyclerView rvForecast) {
-        mRvForecast = rvForecast;
+
+    /* ------------------------------------------------------------------------------------------------
+     * Getters and Setters
+     * ------------------------------------------------------------------------------------------------ */
+    public void setLocationTitle(String title){
+        ((TextView)findViewById(R.id.tvLocationName)).setText(title);
     }
 
     public ForecastAdapter getAdapter() {
         return mAdapter;
-    }
-
-    public void setAdapter(ForecastAdapter adapter) {
-        mAdapter = adapter;
     }
 
     public WeatherManager getWeatherManager() {
@@ -330,27 +375,16 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
         mForecastInfo = forecastInfo;
     }
 
-    public Handler getHandler() {
-        return mHandler;
-    }
-
-    public void setHandler(Handler handler) {
-        mHandler = handler;
-    }
-
-    public LocationWrapper getCurrLocation() {
-        return mCurrLocation;
-    }
-
     public void setCurrLocation(LocationWrapper currLocation) {
         mCurrLocation = currLocation;
-    }
-
-    public String getCurrTemp() {
-        return mCurrTemp;
     }
 
     public void setCurrTemp(String currTemp) {
         mCurrTemp = currTemp;
     }
+
+    public LinearLayoutManager getRecyclerLayoutManager() {
+        return mRecyclerLayoutManager;
+    }
+
 }

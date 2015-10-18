@@ -129,8 +129,4 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
         Log.d(TAG, "Forecast clicked = " + mPosition);
         mListener.onForecastViewClicked(mPosition);
     }
-
-    public interface ForecastViewClickListener {
-        void onForecastViewClicked(int index);
-    }
 }

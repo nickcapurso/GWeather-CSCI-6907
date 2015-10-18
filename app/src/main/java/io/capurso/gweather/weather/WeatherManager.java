@@ -49,6 +49,8 @@ public class WeatherManager implements JSONEventListener{
 
     private byte mState;
 
+    private JSONFetcher mJSONFetcher;
+
     public WeatherManager(WeatherListener clientListener, Location location, Context context){
         mClientListener = clientListener;
         mLocation = location;
@@ -78,7 +80,7 @@ public class WeatherManager implements JSONEventListener{
         url += API_URLS.WUNDERGROUND_FORMAT;
 
         mState = STATE_GET_FORECAST;
-        new JSONFetcher(this).execute(url);
+        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
     }
 
     public void requestCurrentTemp(){
@@ -88,7 +90,12 @@ public class WeatherManager implements JSONEventListener{
         url += API_URLS.WUNDERGROUND_FORMAT;
 
         mState = STATE_GET_CONDITIONS;
-        new JSONFetcher(this).execute(url);
+        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
+    }
+
+    public void cancel(){
+        if(mJSONFetcher != null)
+            mJSONFetcher.cancel(true);
     }
 
     private ForecastInfo createForecastInfo(JSONObject simpleForecast, JSONObject txtForecast)  {

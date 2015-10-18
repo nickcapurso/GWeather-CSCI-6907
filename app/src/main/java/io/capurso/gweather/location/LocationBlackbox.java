@@ -38,6 +38,8 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
     private BlackboxListener mClient;
     private Timeout mLocationTimeout;
 
+    private JSONFetcher mJSONFetcher;
+
     public LocationBlackbox(Context context, BlackboxListener listener){
         mContext = context;
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
@@ -61,6 +63,8 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
             verifyZipcode(zipcode);
             return;
         }
+
+        Log.d(TAG, "Attempting to find location");
 
         if(locationMode.equals(GPS_ONLY)){
             if(!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -136,7 +140,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
         url += location.getLatitude() + "," + location.getLongitude();
         url += API_URLS.WUNDERGROUND_FORMAT;
 
-        new JSONFetcher(this).execute(url);
+        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
     }
 
 
@@ -150,7 +154,13 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
         url += zipcode;
         url += API_URLS.WUNDERGROUND_FORMAT;
 
-        new JSONFetcher(this).execute(url);
+        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
+    }
+
+    public void cancel(){
+        if(mJSONFetcher != null)
+            mJSONFetcher.cancel(true);
+        mLocationManager.removeUpdates(this);
     }
 
     @Override

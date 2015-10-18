@@ -18,9 +18,9 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastViewHolder> {
 
     private int mLastAnimated = -1;
     private int mOrientation;
-    private ForecastViewHolder.ForecastViewClickListener mListener;
+    private ForecastViewClickListener mListener;
 
-    public ForecastAdapter(Context context, List<ForecastInfo> info, ForecastViewHolder.ForecastViewClickListener listener){
+    public ForecastAdapter(Context context, List<ForecastInfo> info, ForecastViewClickListener listener){
         mContext = context;
         mForecastInfo = info;
         mOrientation = context.getResources().getConfiguration().orientation;
