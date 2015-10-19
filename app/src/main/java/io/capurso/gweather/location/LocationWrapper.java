@@ -5,7 +5,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by Nick on 10/3/2015.
+ * Wraps together a Location object (lat / lon), a textual description (ex. "New York, NY 10001, USA")
+ * and an image search string (ex. "New York, NY")
+ *
+ * Implements Parcelable for persistence after screen rotation.
  */
 public class LocationWrapper implements Parcelable {
     public Location location;
@@ -18,6 +21,7 @@ public class LocationWrapper implements Parcelable {
         this.searchString = searchString;
     }
 
+    //Reconstruct in the same order as the data was written out
     public LocationWrapper(Parcel parcel){
         location = new Location("");
         location.setLatitude(parcel.readDouble());
@@ -39,7 +43,7 @@ public class LocationWrapper implements Parcelable {
         dest.writeString(searchString);
     }
 
-    //Formally used to call the constructor to recreate an AddressInfo from a parcel
+    //Formally used to call the constructor to recreate a LocationWrapper from a parcel
     public static final Creator CREATOR = new Creator() {
         @Override
         public LocationWrapper createFromParcel(Parcel source) {

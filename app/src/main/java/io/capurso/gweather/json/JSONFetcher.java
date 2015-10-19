@@ -26,19 +26,44 @@ import static io.capurso.gweather.common.Utils.DEBUG;
  * since all APIs used return JSON objects.
  */
 public class JSONFetcher extends AsyncTask<String, Void, String> implements TimeoutListener {
-    private static final String TAG = "JSONFetcher";
+    private static final String TAG = JSONFetcher.class.getName();
+
+    /**
+     * Indicates a successful network query. Used by doInBackground.
+     */
     private static final String RESULT_GOOD = "success";
+
+    /**
+     * Indicates a failed network query. Used by doInBackground.
+     */
     private static final String RESULT_ERR = "error";
+
+    /**
+     * Ignores a returning network request if the timeout expires.
+     */
     private boolean mTimeoutOccurred;
+
+    /**
+     * The "client" listener to send callbacks to.
+     */
     private JSONEventListener mClientListener;
+
+    /**
+     * Internally uses a Timeout instance to determine when a network request is taking
+     * too long.
+     */
     private Timeout mTimer;
 
+    /**
+     * Default constructor - takes in a listener for callbacks.
+     * @param client For result callbacks.
+     */
     public JSONFetcher(JSONEventListener client){
         mClientListener = client;
     }
 
     /**
-     * Begin a network timeout timer which will alert the caller's handler if the timeout expires
+     * Before making the network request, start the countdown timer.
      */
     @Override
     protected void onPreExecute() {
@@ -58,7 +83,7 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
      *               param[0] = "http://maps.google.com/maps/api/geocode/json"
      *               param[1] = "address"
      *               param[2] = "123 Main Street ..."
-     * @return "err" or "okay"
+     * @return Returns the retrieved data on success, or an error code on failure.
      */
     @Override
     protected String doInBackground(String... params) {
@@ -95,24 +120,26 @@ public class JSONFetcher extends AsyncTask<String, Void, String> implements Time
 
     @Override
     protected void onPostExecute(String result) {
+        //Ignore the result if a timeout had occurred.
         if(mTimeoutOccurred)
             return;
 
+        //Otherwise, cancel the timer.
         mTimer.cancel();
 
         if(DEBUG) Log.d(TAG, "Result: " + result);
 
-        //Send the handler code for JSON fetching errors
-        if(result.equals(RESULT_ERR)){
+        //If there was an error, notify the client via the interface. Otherwise, send them
+        //the JSON data contained in a String.
+        if(result.equals(RESULT_ERR))
             mClientListener.onJSONFetchErr();
-
-        //Send a handler message indicated that the fetch was successful and include the JSON result
-        //as the message's contained object.
-        }else {
+        else
             mClientListener.onJSONFetchSuccess(result);
-        }
     }
 
+    /**
+     * If a timeout occurs, notify the client via the interface.
+     */
     @Override
     public void onTimeout() {
         mTimeoutOccurred = true;

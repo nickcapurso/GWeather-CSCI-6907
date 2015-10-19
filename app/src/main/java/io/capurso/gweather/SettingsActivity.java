@@ -8,10 +8,17 @@ import android.view.View;
 
 import io.capurso.gweather.common.Utils;
 
-
+/**
+ * The Activity which manages the user's settings. The official Android documentation suggests
+ * the use of the PreferenceFragment class.
+ */
 public class SettingsActivity extends AppCompatActivity implements SettingsFragment.onSettingsChangedListener{
     private static final String TAG = SettingsActivity.class.getName();
 
+    /**
+     * Set up the SettingsFragment to display the app settings.
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -24,6 +31,10 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
                 .commit();
     }
 
+    /**
+     * Prepare the pre-Lollipop Action Bar so that the correct activity title is
+     * displays along with a back navigation arrow.
+     */
     private void setupActionBar(){
         ActionBar bar;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -43,6 +54,12 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         }
     }
 
+    /**
+     * Callback from the SettingsFragment. Used to notify the
+     * ForecastActivity that the user has changed some preference
+     * that requires the current forecast to be refreshed (or not).
+     * @param requiresRefresh
+     */
     @Override
     public void onSettingChanged(boolean requiresRefresh) {
         if(requiresRefresh)

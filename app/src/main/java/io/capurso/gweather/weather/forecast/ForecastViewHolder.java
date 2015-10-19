@@ -13,6 +13,10 @@ import com.squareup.picasso.Picasso;
 
 import io.capurso.gweather.R;
 
+/**
+ * Holds onto the views for each list item in the RecyclerView.
+ * For the layout see: row_forecast.xml
+ */
 public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     private static final String TAG = ForecastViewHolder.class.getName();
     private View mContainer;
@@ -38,6 +42,8 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
         mIvWeatherIcon = (ImageView) view.findViewById(R.id.ivWeatherIcon);
 
 
+        //Set onClick listener if we're in portrait mode. Otherwise, show the
+        //detailed information if we're in landscape mode.
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setupDetailWidgets(view);
             view.setClickable(false);
@@ -46,6 +52,10 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
         }
     }
 
+    /**
+     * Set up views for all the detailed information (when in landscape mode).
+     * @param view
+     */
     private void setupDetailWidgets(View view){
         mDetailFullDesc = (TextView)view.findViewById(R.id.detail_full_desc);
         mDetailLow = (TextView)view.findViewById(R.id.value_detail_low);
@@ -57,11 +67,30 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
         mDetailWindDir = (TextView)view.findViewById(R.id.value_detail_winddir);
         mDetailSnow = (TextView)view.findViewById(R.id.value_detail_snow);
 
+        //We're using the same layout as the detail forecast dialog, but we
+        //don't want the day of the week to be repeated again. Hide it.
         LinearLayout detailHeader = (LinearLayout)view.findViewById(R.id.detailHeader);
         detailHeader.setVisibility(View.GONE);
 
         View shadowView = (View)view.findViewById(R.id.viewShadow);
         shadowView.setVisibility(View.GONE);
+    }
+
+    /**
+     * Call the listener on a click event.
+     * @param v
+     */
+    @Override
+    public void onClick(View v) {
+        Log.d(TAG, "Forecast clicked = " + mPosition);
+        mListener.onForecastViewClicked(mPosition);
+    }
+
+    /* ------------------------------------------------------------------------------------------------
+     * Getters and Setters
+     * ------------------------------------------------------------------------------------------------ */
+    public View getContainer() {
+        return mContainer;
     }
 
     public void setPosition(int i){
@@ -82,10 +111,6 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
 
     public void setIcon(String url, Context context){
         Picasso.with(context).load(url).into(mIvWeatherIcon);
-    }
-
-    public View getContainer() {
-        return mContainer;
     }
 
     public void setDetailLow(String detailLow) {
@@ -122,11 +147,5 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
 
     public void setDetailFullDesc(String detailFullDesc) {
         mDetailFullDesc.setText(detailFullDesc);
-    }
-
-    @Override
-    public void onClick(View v) {
-        Log.d(TAG, "Forecast clicked = " + mPosition);
-        mListener.onForecastViewClicked(mPosition);
     }
 }

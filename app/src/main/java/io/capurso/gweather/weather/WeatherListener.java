@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import io.capurso.gweather.weather.forecast.ForecastInfo;
 
 /**
- * Created by Nick on 10/3/2015.
+ * Listener for weather-related events by the WeatherManager.
  */
 public interface WeatherListener {
     void onForecastReceived(ArrayList<ForecastInfo> forecast);

@@ -1,7 +1,7 @@
 package io.capurso.gweather.weather.forecast;
 
 /**
- * Created by Nick on 10/18/2015.
+ * Listener for click events by ForecastViewHolder
  */
 public interface ForecastViewClickListener {
     void onForecastViewClicked(int index);

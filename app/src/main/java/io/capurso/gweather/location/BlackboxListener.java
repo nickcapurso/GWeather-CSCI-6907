@@ -1,7 +1,7 @@
 package io.capurso.gweather.location;
 
 /**
- * Created by Nick on 10/3/2015.
+ * Listener for location-related events by the LocationBlackbox class.
  */
 public interface BlackboxListener {
     void onLocationFound(LocationWrapper location);

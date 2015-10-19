@@ -4,6 +4,12 @@ package io.capurso.gweather.weather.forecast;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Holds information about the forecast of a given day. The more "detailed" information is
+ * shown while in landscape mode or when clicking on a list item in portrait mode.
+ *
+ * Implements Parcelable so it can persist across screen rotations.
+ */
 public class ForecastInfo implements Parcelable{
     public String day, weatherDesc, lowHigh, formalDesc, windDir, iconUrl;
     public int aveWind, maxWind, humidity;
@@ -20,6 +26,7 @@ public class ForecastInfo implements Parcelable{
         this.iconUrl = iconUrl;
     }
 
+    //Reconstruct in the same order the data was written out in
     public ForecastInfo(Parcel parcel){
         day = parcel.readString();
         weatherDesc = parcel.readString();
