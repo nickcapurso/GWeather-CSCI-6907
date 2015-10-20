@@ -52,7 +52,6 @@
     <string name="pref_location">Location</string>
     <string name="pref_misc">Miscellaneous</string>
     <string name="pref_location_mode">Mode</string>
-    <string name="pref_location_desc">Adjust location access modes and zipcode override</string>
     <string name="pref_metric">Temperature Metric</string>
     <string name="pref_zipcode_use">Use Zipcode</string>
     <string name="pref_zipcode_use_desc">Use specified zipcode instead of location hardware</string>

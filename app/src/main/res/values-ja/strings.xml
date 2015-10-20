@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">G天気</string>
+    <string name="refresh">リフレッシュ</string>
+    <string name="action_settings">設定</string>
+    <string name="okay">はい</string>
+    <string name="fix">修正します</string>
+    <string name="retry">リトライ</string>
+    <string name="location_services">位置情報サービス</string>
+    <string name="gps_location">位置情報サービスのGPS</string>
+    <string name="network_location">位置情報サービスのネットワーク</string>
+    <string name="is_not_enabled">が有効になっていません。</string>
+    <string name="error_determine_location">場所が見つかりませんでした。</string>
+    <string name="error_internet">インターネット接続を確認してください。</string>
+    <string name="error_zipcode">無効な郵便番号</string>
+
+    <string name="please_wait">お待ちください...</string>
+    <string name="loading_forecast">天気をロードします！</string>
+
+    <string name="low">低温</string>
+    <string name="high">高温</string>
+    <string name="humidity">湿度</string>
+    <string name="rain">雨</string>
+    <string name="avgwind">平均風速</string>
+    <string name="maxwind">最大風</string>
+    <string name="雪">方向</string>
+    <string name="snow">雪</string>
+
+    <string name="pref_location">位置情報</string>
+    <string name="pref_misc">種々雑多な</string>
+    <string name="pref_location_mode">モード</string>
+    <string name="pref_metric">温度のメトリック</string>
+    <string name="pref_zipcode_use">郵便番号を使用します</string>
+    <string name="pref_zipcode_use_desc">代わりの場所のハードウェアの郵便番号を使用します</string>
+    <string name="pref_zipcode_set">郵便番号を設定します</string>
+    <string name="pref_forecast_size">予測のサイズ</string>
+    <string name="pref_forecast_summary_suffix">-日間の予報</string>
+
+    <string-array name="pref_location_list">
+        <item>GPSのみ</item>
+        <item>ネットワークのみ</item>
+        <item>GPSとネットワーク</item>
+    </string-array>
+
+    <string-array name="pref_metrics_list">
+        <item>ファーレンハイト (&#176;F)</item>
+        <item>セ氏 (&#176;C)</item>
+    </string-array>
+</resources>
