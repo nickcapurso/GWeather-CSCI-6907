@@ -113,26 +113,26 @@ public class WeatherManager implements JSONEventListener{
      * Start a network request to the Wunderground API to get the weekly forecast.
      */
     public void requestForecast(){
-        //TODO use something mutable
-        String url = API_URLS.WUNDERGROUND + API_URLS.WUNDERGROUND_FORECAST;
-        url += mLocation.getLatitude() + "," + mLocation.getLongitude();
-        url += API_URLS.WUNDERGROUND_FORMAT;
+        //Set up forecast URL
+        StringBuilder url = new StringBuilder(API_URLS.WUNDERGROUND).append(API_URLS.WUNDERGROUND_FORECAST)
+        .append(mLocation.getLatitude()).append(",").append(mLocation.getLongitude())
+        .append(API_URLS.WUNDERGROUND_FORMAT);
 
         mState = STATE_GET_FORECAST;
-        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
+        (mJSONFetcher = new JSONFetcher(this)).execute(url.toString());
     }
 
     /**
      * Start a network request to the Wunderground API to get the current weather conditions (including temp).
      */
     public void requestCurrentTemp(){
-        //TODO use something mutable
-        String url = API_URLS.WUNDERGROUND + API_URLS.WUNDERGROUND_CONDITIONS;
-        url += mLocation.getLatitude() + "," + mLocation.getLongitude();
-        url += API_URLS.WUNDERGROUND_FORMAT;
+        //Set up current weather conditions URL
+        StringBuilder url = new StringBuilder(API_URLS.WUNDERGROUND).append(API_URLS.WUNDERGROUND_CONDITIONS)
+        .append(mLocation.getLatitude()).append(",").append(mLocation.getLongitude())
+        .append(API_URLS.WUNDERGROUND_FORMAT);
 
         mState = STATE_GET_CONDITIONS;
-        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
+        (mJSONFetcher = new JSONFetcher(this)).execute(url.toString());
     }
 
     /**

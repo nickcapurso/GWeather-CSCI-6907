@@ -146,10 +146,29 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
 
         //Start a timer for finding location.
         mLocationTimeout = new Timeout(new TimeoutListener() {
+
+            /**
+             * On timeout, attempt to fall back on last known location. If this fails, alert the
+             * activity via callback.
+             */
             @Override
             public void onTimeout() {
-                mLocationManager.removeUpdates(LocationBlackbox.this); //Cancel location updates
-                mClient.onBlackboxError(ErrorCodes.ERR_LOCATION_TIMEOUT); //Error callback
+                if(DEBUG) Log.d(TAG, "Location timeout");
+
+                Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(lastKnownLocation == null){
+                    lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                    if(lastKnownLocation == null){
+                        if(DEBUG) Log.d(TAG, "No last known location available");
+                        mLocationManager.removeUpdates(LocationBlackbox.this); //Cancel location updates
+                        mClient.onBlackboxError(ErrorCodes.ERR_LOCATION_TIMEOUT); //Error callback
+                        return;
+                    }
+                }
+
+                if(DEBUG) Log.d(TAG, "Falling back on last known location");
+                onLocationChanged(lastKnownLocation);
             }
         });
         mLocationTimeout.start();
@@ -210,14 +229,13 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
     private void reverseGeocode(Location location){
         if(DEBUG) Log.d(TAG, "Starting reverse geocoding");
 
-        //TODO use something mutable
         //Set up reverse geocoding URL.
-        String url = API_URLS.WUNDERGROUND + API_URLS.WUNDERGROUND_REVERSE_GEOCODE;
-        url += location.getLatitude() + "," + location.getLongitude();
-        url += API_URLS.WUNDERGROUND_FORMAT;
+        StringBuilder url = new StringBuilder(API_URLS.WUNDERGROUND).append(API_URLS.WUNDERGROUND_REVERSE_GEOCODE)
+        .append(location.getLatitude()).append(",").append(location.getLongitude())
+        .append(API_URLS.WUNDERGROUND_FORMAT);
 
         //Start network AsyncTask
-        (mJSONFetcher = new JSONFetcher(this)).execute(url);;
+        (mJSONFetcher = new JSONFetcher(this)).execute(url.toString());
     }
 
     /**

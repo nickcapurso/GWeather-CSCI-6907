@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import io.capurso.gweather.R;
+import static io.capurso.gweather.common.Utils.DEBUG;
 
 /**
  * Holds onto the views for each list item in the RecyclerView.
@@ -82,7 +83,7 @@ public class ForecastViewHolder extends RecyclerView.ViewHolder implements View.
      */
     @Override
     public void onClick(View v) {
-        Log.d(TAG, "Forecast clicked = " + mPosition);
+        if(DEBUG) Log.d(TAG, "Forecast clicked = " + mPosition);
         mListener.onForecastViewClicked(mPosition);
     }
 
