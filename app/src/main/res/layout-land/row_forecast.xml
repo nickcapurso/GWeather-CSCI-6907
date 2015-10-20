@@ -2,6 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/default_margin"
+    android:layout_marginRight="@dimen/default_margin"
     android:orientation="vertical">
 
 
@@ -9,7 +11,7 @@
 
         android:layout_marginTop="@dimen/default_margin"
         android:layout_marginBottom="@dimen/default_margin"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/landscape_forecast_width"
         android:layout_height="wrap_content">
 
         <LinearLayout
@@ -79,7 +81,7 @@
     <android.support.v7.widget.CardView
 
         android:layout_marginBottom="@dimen/default_margin"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/landscape_forecast_width"
         android:layout_height="match_parent">
 
         <ScrollView
@@ -88,6 +90,4 @@
             <include layout="@layout/view_forecast_detail"/>
         </ScrollView>
     </android.support.v7.widget.CardView>
-
-
 </LinearLayout>

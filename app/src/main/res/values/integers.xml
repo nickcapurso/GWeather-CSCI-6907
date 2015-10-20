@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="forecast_size_default">3</integer>
-    <integer name="forecast_size_min">1</integer>
+    <integer name="forecast_size_min">3</integer>
     <integer name="forecast_size_max">10</integer>
 </resources>

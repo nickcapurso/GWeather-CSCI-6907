@@ -3,6 +3,7 @@ package io.capurso.gweather;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -293,7 +294,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             case WeatherManager.ErrorCodes.ERR_NETWORK_TIMEOUT:
                 String message = getString(R.string.error_internet);
 
-                Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_LONG);
+                Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_INDEFINITE);
                 retryBar.setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -314,13 +315,22 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
     private void staggerInForecast(ArrayList<ForecastInfo> forecast){
         long uptime = SystemClock.uptimeMillis() + FORECAST_VIEW_DELAY;
         for(final ForecastInfo info : forecast){
-            mHandler.postAtTime(new Runnable() {
-                @Override
-                public void run() {
-                    mForecastInfo.add(info);
-                    mAdapter.notifyDataSetChanged();
-                }
-            }, uptime += FORECAST_VIEW_DELAY); //Add each View 300ms apart
+
+            //Lollipop devices don't get the stagger-in-gradually effect (buggy).
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mForecastInfo.add(info);
+                mAdapter.notifyDataSetChanged();
+
+            //For pre-Lollipop (and above Jelly Bean), use the stagger-in
+            }else{
+                mHandler.postAtTime(new Runnable() {
+                    @Override
+                    public void run() {
+                        mForecastInfo.add(info);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }, uptime += FORECAST_VIEW_DELAY); //Add each View 300ms apart
+            }
         }
     }
 
@@ -353,7 +363,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
             //The user inputted a bad zipcode. The Snackbar will give the user the option to go into the
             //SettingsActivity and fix the zipcode.
             case LocationBlackbox.ErrorCodes.ERR_BAD_ZIP:
-                Snackbar fixBar = Snackbar.make(mMainLayout, getString(R.string.error_zipcode), Snackbar.LENGTH_LONG);
+                Snackbar fixBar = Snackbar.make(mMainLayout, getString(R.string.error_zipcode), Snackbar.LENGTH_INDEFINITE);
                 fixBar.setAction(getString(R.string.fix), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -372,7 +382,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
                 String message = errCode == LocationBlackbox.ErrorCodes.ERR_LOCATION_TIMEOUT?
                         getString(R.string.error_determine_location) : getString(R.string.error_internet);
 
-                Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_LONG);
+                Snackbar retryBar = Snackbar.make(mMainLayout, message, Snackbar.LENGTH_INDEFINITE);
                 retryBar.setAction(getString(R.string.retry), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -396,7 +406,7 @@ public class ForecastActivity extends AppCompatActivity implements BlackboxListe
                 else
                     provider = getString(R.string.location_services);
 
-                Snackbar locationBar = Snackbar.make(mMainLayout, provider + getString(R.string.is_not_enabled), Snackbar.LENGTH_LONG);
+                Snackbar locationBar = Snackbar.make(mMainLayout, provider + getString(R.string.is_not_enabled), Snackbar.LENGTH_INDEFINITE);
                 locationBar.setAction(getString(R.string.fix), new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

@@ -195,7 +195,7 @@ public class LocationBlackbox implements LocationListener, JSONEventListener {
             jsonTop = new JSONObject(jsonData);
 
             //If the user entered not-actual zipcode, use the error callback.
-            if(jsonTop.has("error")){
+            if(jsonTop.getJSONObject("response").has("error")){
                 mClient.onBlackboxError(ErrorCodes.ERR_BAD_ZIP);
                 return null;
             }
