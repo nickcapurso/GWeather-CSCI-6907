@@ -27,7 +27,8 @@
 
             android:gravity="center"
             android:textSize="@dimen/text_size_h1"
-            android:text="@string/placeholder_city" />
+            android:text="@string/placeholder_city"
+            android:visibility="gone"/>
 
         <View
             android:id="@+id/dividerView"
@@ -36,7 +37,8 @@
             android:layout_below="@id/tvLocationName"
             android:layout_marginTop="@dimen/default_content_margin"
             android:layout_marginBottom="@dimen/default_content_margin"
-            android:background="@color/dark_shadow" />
+            android:background="@color/dark_shadow"
+            android:visibility="gone"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvForecast"
